@@ -433,8 +433,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private void verifyPaymentSignature(String orderId, String paymentId, String signature) {
-        if (orderId != null && orderId.startsWith("order_dev_")) return;
-        if (!StringUtils.hasText(razorpayKeySecret)) return;
         if (!StringUtils.hasText(signature)) throw new BadRequestException("Payment signature is required");
 
         try {
