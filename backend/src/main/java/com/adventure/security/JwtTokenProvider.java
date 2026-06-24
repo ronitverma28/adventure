@@ -50,11 +50,20 @@ public class JwtTokenProvider {
     }
 
     public String generateToken(String email) {
-        return buildToken(new HashMap<>(), email, jwtExpiration);
+        Map<String,Object> claims = new HashMap<>();
+        claims.put("tokenType","ACCESS");
+        return buildToken(claims,email,jwtExpiration);
+
     }
 
     public String generateRefreshToken(String email) {
-        return buildToken(new HashMap<>(), email, refreshExpiration);
+        Map<String,Object> claims = new HashMap<>();
+        claims.put("tokenType","REFRESH");
+        return buildToken(claims,email,refreshExpiration);
+    }
+
+    public String extractTokenType(String token) {
+        return extractClaim(token, claims -> claims.get("tokenType", String.class));
     }
 
     private String buildToken(Map<String, Object> extraClaims, String subject, long expiration) {
