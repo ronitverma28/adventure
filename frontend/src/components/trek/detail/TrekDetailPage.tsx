@@ -1,57 +1,41 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import {
-  Star, Clock, Mountain, TrendingUp, Thermometer,
-  MapPin, Users, Share2, Heart, ChevronDown, ArrowRight,
-  Camera, Calendar, Shield, Backpack, UserCheck,
-  MessageSquare, HelpCircle, Navigation, Wind,
-} from 'lucide-react';
-import { Trek } from '@/types/trek.types';
-import { TREK_EXTRA, DEFAULT_TREK_EXTRA } from '@/lib/data/trek-extra';
-import { DIFFICULTY_CONFIG } from '@/lib/constants/trek.constants';
+import { useEffect, useRef, useState } from 'react';
+import { MessageSquare, UserCheck, Calendar, Backpack, Mountain, Navigation } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
-
-// Section components
+import { DIFFICULTY_CONFIG } from '@/lib/constants/trek.constants';
+import type { TrekDetail } from '@/types/trek.types';
 import { TrekHeroBanner } from './TrekHeroBanner';
 import { TrekPhotoGallery } from './TrekPhotoGallery';
 import { TrekQuickInfo } from './TrekQuickInfo';
 import { TrekItineraryTimeline } from './TrekItineraryTimeline';
-import { TrekWeatherWidget } from './TrekWeatherWidget';
 import { TrekPackingChecklist } from './TrekPackingChecklist';
-import { TrekFitnessSection } from './TrekFitnessSection';
-import { TrekSafetySection } from './TrekSafetySection';
 import { TrekGuideProfile } from './TrekGuideProfile';
 import { TrekAvailableBatches } from './TrekAvailableBatches';
 import { TrekReviewsSection } from './TrekReviewsSection';
-import { TrekFAQSection } from './TrekFAQSection';
 import { TrekMapSection } from './TrekMapSection';
 import { TrekStickyBooking } from './TrekStickyBooking';
 
-const NAV_SECTIONS = [
-  { id: 'overview',   label: 'Overview',   icon: Mountain },
-  { id: 'itinerary',  label: 'Itinerary',  icon: Navigation },
-  { id: 'weather',    label: 'Weather',    icon: Wind },
-  { id: 'packing',    label: 'Packing',    icon: Backpack },
-  { id: 'fitness',    label: 'Fitness',    icon: TrendingUp },
-  { id: 'safety',     label: 'Safety',     icon: Shield },
-  { id: 'guide',      label: 'Guide',      icon: UserCheck },
-  { id: 'batches',    label: 'Dates',      icon: Calendar },
-  { id: 'reviews',    label: 'Reviews',    icon: MessageSquare },
-  { id: 'faq',        label: 'FAQ',        icon: HelpCircle },
-];
+const BASE_SECTIONS = [
+  { id: 'overview', label: 'Overview', icon: Mountain },
+  { id: 'itinerary', label: 'Itinerary', icon: Navigation },
+  { id: 'packing', label: 'Packing', icon: Backpack },
+  { id: 'batches', label: 'Dates', icon: Calendar },
+  { id: 'reviews', label: 'Reviews', icon: MessageSquare },
+] as const;
 
-export function TrekDetailPage({ trek }: { trek: Trek }) {
-  const extra = TREK_EXTRA[trek.slug] ?? DEFAULT_TREK_EXTRA;
-  const diff  = DIFFICULTY_CONFIG[trek.difficulty];
-
+export function TrekDetailPage({ trek }: { trek: TrekDetail }) {
   const [activeSection, setActiveSection] = useState('overview');
-  const [navSticky, setNavSticky]         = useState(false);
-  const [isWishlisted, setIsWishlisted]   = useState(false);
+  const [navSticky, setNavSticky] = useState(false);
+  const [isWishlisted, setIsWishlisted] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
+  const diff = DIFFICULTY_CONFIG[trek.difficulty];
 
-  // Sticky nav detection
+  const sections = [
+    ...BASE_SECTIONS,
+    ...(trek.guides && trek.guides.length > 0 ? [{ id: 'guide', label: 'Guide', icon: UserCheck }] : []),
+  ];
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => setNavSticky(!entry.isIntersecting),
@@ -61,36 +45,51 @@ export function TrekDetailPage({ trek }: { trek: Trek }) {
     return () => observer.disconnect();
   }, []);
 
-  // Active section on scroll
   useEffect(() => {
     const handleScroll = () => {
-      for (const section of [...NAV_SECTIONS].reverse()) {
-        const el = document.getElementById(section.id);
-        if (el && el.getBoundingClientRect().top <= 120) {
+      for (const section of [...sections].reverse()) {
+        const element = document.getElementById(section.id);
+        if (element && element.getBoundingClientRect().top <= 120) {
           setActiveSection(section.id);
           break;
         }
       }
     };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [sections]);
 
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
+  const galleryImages = (trek.images ?? []).map((image) => ({
+    url: image.imageUrl,
+    caption: image.caption || image.altText || trek.title,
+  }));
+
+  const guide = trek.guides?.[0]
+    ? {
+        name: trek.guides[0].name,
+        photo: trek.guides[0].photoUrl || trek.coverImageUrl || '',
+        experience: trek.guides[0].experienceYears || 0,
+        languages: trek.guides[0].languages || [],
+        certifications: trek.guides[0].certifications || [],
+        bio: trek.guides[0].bio,
+        rating: trek.guides[0].avgRating || trek.avgRating || 0,
+        totalTreks: trek.totalBookings || 0,
+      }
+    : null;
 
   return (
     <div className="min-h-screen bg-background">
-      {/* ── Hero Banner ── */}
       <TrekHeroBanner
         trek={trek}
-        extra={extra}
+        extra={{
+          meetingPoint: trek.meetingPoint || trek.location,
+          nearestAirport: trek.nearestAirport || 'Not specified',
+        }}
         isWishlisted={isWishlisted}
-        onWishlist={() => setIsWishlisted((v) => !v)}
+        onWishlist={() => setIsWishlisted((value) => !value)}
       />
 
-      {/* ── Sticky Section Nav ── */}
       <div ref={navRef} className="border-b border-border bg-background">
         <div
           className={cn(
@@ -100,19 +99,19 @@ export function TrekDetailPage({ trek }: { trek: Trek }) {
         >
           <div className="container">
             <div className="flex items-center gap-1 overflow-x-auto py-3 scrollbar-hide">
-              {NAV_SECTIONS.map((s) => (
+              {sections.map((section) => (
                 <button
-                  key={s.id}
-                  onClick={() => scrollTo(s.id)}
+                  key={section.id}
+                  onClick={() => document.getElementById(section.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
                   className={cn(
                     'flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-all',
-                    activeSection === s.id
+                    activeSection === section.id
                       ? 'bg-brand-500 text-white'
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
-                  <s.icon className="h-3.5 w-3.5" />
-                  {s.label}
+                  <section.icon className="h-3.5 w-3.5" />
+                  {section.label}
                 </button>
               ))}
             </div>
@@ -120,108 +119,68 @@ export function TrekDetailPage({ trek }: { trek: Trek }) {
         </div>
       </div>
 
-      {/* ── Main Layout ── */}
       <div className="container py-10">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_360px]">
-          {/* Left Column */}
-          <div className="space-y-16 min-w-0">
-
-            {/* Overview + Quick Info */}
+          <div className="min-w-0 space-y-16">
             <section id="overview">
               <TrekQuickInfo trek={trek} diff={diff} />
             </section>
 
-            {/* Photo Gallery */}
-            <section id="gallery">
-              <TrekPhotoGallery images={extra.galleryImages} trekTitle={trek.title} />
-            </section>
+            {galleryImages.length > 0 && (
+              <section id="gallery">
+                <TrekPhotoGallery images={galleryImages} trekTitle={trek.title} />
+              </section>
+            )}
 
-            {/* Itinerary */}
-            <section id="itinerary">
-              <TrekItineraryTimeline trek={trek} />
-            </section>
+            {(trek.itinerary?.length ?? 0) > 0 && (
+              <section id="itinerary">
+                <TrekItineraryTimeline trek={trek} />
+              </section>
+            )}
 
-            {/* Map */}
-            <section id="map">
-              <TrekMapSection
-                lat={extra.latitude}
-                lng={extra.longitude}
-                trekTitle={trek.title}
-                meetingPoint={extra.meetingPoint}
-                nearestAirport={extra.nearestAirport}
-                nearestRailway={extra.nearestRailway}
-              />
-            </section>
+            {(trek.latitude && trek.longitude) || trek.meetingPoint || trek.nearestAirport || trek.nearestRailway ? (
+              <section id="map">
+                <TrekMapSection
+                  lat={trek.latitude || 0}
+                  lng={trek.longitude || 0}
+                  trekTitle={trek.title}
+                  meetingPoint={trek.meetingPoint || trek.location}
+                  nearestAirport={trek.nearestAirport || 'Not specified'}
+                  nearestRailway={trek.nearestRailway || 'Not specified'}
+                />
+              </section>
+            ) : null}
 
-            {/* Weather */}
-            <section id="weather">
-              <TrekWeatherWidget lat={extra.latitude} lng={extra.longitude} trekTitle={trek.title} />
-            </section>
+            {((trek.thingsToCarry?.length ?? 0) > 0 || (trek.inclusions?.length ?? 0) > 0 || (trek.exclusions?.length ?? 0) > 0) && (
+              <section id="packing">
+                <TrekPackingChecklist
+                  items={trek.thingsToCarry || []}
+                  inclusions={trek.inclusions || []}
+                  exclusions={trek.exclusions || []}
+                />
+              </section>
+            )}
 
-            {/* Packing Checklist */}
-            <section id="packing">
-              <TrekPackingChecklist
-                items={extra.thingsToCarry}
-                inclusions={extra.inclusions}
-                exclusions={extra.exclusions}
-              />
-            </section>
+            {guide && (
+              <section id="guide">
+                <TrekGuideProfile guide={guide} />
+              </section>
+            )}
 
-            {/* Fitness */}
-            <section id="fitness">
-              <TrekFitnessSection fitness={extra.fitnessRequirements} difficulty={trek.difficulty} />
-            </section>
-
-            {/* Safety */}
-            <section id="safety">
-              <TrekSafetySection safetyInfo={extra.safetyInfo} />
-            </section>
-
-            {/* Guide */}
-            <section id="guide">
-              <TrekGuideProfile guide={extra.guide} />
-            </section>
-
-            {/* Available Batches */}
             <section id="batches">
               <TrekAvailableBatches trek={trek} />
             </section>
 
-            {/* Reviews */}
             <section id="reviews">
               <TrekReviewsSection trek={trek} />
             </section>
-
-            {/* FAQ */}
-            <section id="faq">
-              <TrekFAQSection faqs={extra.faqs} />
-            </section>
           </div>
 
-          {/* Right Column — Sticky Booking */}
           <div className="hidden lg:block">
             <div className="sticky top-20">
               <TrekStickyBooking trek={trek} />
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Mobile Sticky Booking Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 p-4 backdrop-blur-xl lg:hidden">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <div className="text-xs text-muted-foreground">Starting from</div>
-            <div className="font-display text-xl font-bold text-foreground">
-              ₹{trek.pricePerPerson.toLocaleString('en-IN')}
-            </div>
-          </div>
-          <a
-            href={`/bookings/new?trek=${trek.slug}`}
-            className="flex items-center gap-2 rounded-xl bg-brand-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-500/30"
-          >
-            Book Now <ArrowRight className="h-4 w-4" />
-          </a>
         </div>
       </div>
     </div>

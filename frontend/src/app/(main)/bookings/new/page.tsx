@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import {
@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { bookingApi } from '@/lib/api/booking.api';
-import { MOCK_TREKS } from '@/lib/data/mock-treks';
+import { trekApi } from '@/lib/api/trek.api';
 import { useAuthStore } from '@/store/authStore';
 import { useBookingStore } from '@/store/bookingStore';
 import { formatCurrency, formatDate } from '@/lib/utils/formatters';
@@ -77,10 +77,12 @@ function NewBookingContent() {
   const { user, isAuthenticated } = useAuthStore();
   const { isProcessing, setProcessing, updateFormData, reset } = useBookingStore();
 
-  const initialTrekSlug = params.get('trek') ?? MOCK_TREKS[0]?.slug ?? '';
+  const initialTrekSlug = params.get('trek') ?? '';
   const initialBatchId = Number(params.get('batch') ?? 0);
   const initialTravelers = Math.max(1, Number(params.get('persons') ?? 1));
 
+  const [treks, setTreks] = useState<Trek[]>([]);
+  const [treksLoading, setTreksLoading] = useState(true);
   const [step, setStep] = useState(1);
   const [selectedTrekSlug, setSelectedTrekSlug] = useState(initialTrekSlug);
   const [selectedBatchId, setSelectedBatchId] = useState(initialBatchId);
@@ -99,9 +101,40 @@ function NewBookingContent() {
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [confirmation, setConfirmation] = useState<BookingConfirmation | null>(null);
 
+  useEffect(() => {
+    let active = true;
+
+    async function loadTreks() {
+      try {
+        const response = await trekApi.getAll(undefined, 0, 100);
+        if (!active) return;
+        setTreks(response.data.data.content);
+      } catch {
+        if (active) toast.error('Failed to load treks');
+      } finally {
+        if (active) setTreksLoading(false);
+      }
+    }
+
+    loadTreks();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (treks.length === 0) return;
+    if (!selectedTrekSlug) {
+      setSelectedTrekSlug(treks[0]?.slug ?? '');
+      return;
+    }
+    const exists = treks.some((trek) => trek.slug === selectedTrekSlug);
+    if (!exists) setSelectedTrekSlug(treks[0]?.slug ?? '');
+  }, [selectedTrekSlug, treks]);
+
   const selectedTrek = useMemo(
-    () => MOCK_TREKS.find((item) => item.slug === selectedTrekSlug) ?? null,
-    [selectedTrekSlug]
+    () => treks.find((item) => item.slug === selectedTrekSlug) ?? null,
+    [selectedTrekSlug, treks]
   );
   const batches = selectedTrek?.upcomingBatches ?? [];
   const selectedBatch = batches.find((item) => item.id === selectedBatchId) ?? batches[0] ?? null;
@@ -135,6 +168,14 @@ function NewBookingContent() {
         <Link href="/login" className="mt-6 rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white">
           Login to continue
         </Link>
+      </section>
+    );
+  }
+
+  if (treksLoading) {
+    return (
+      <section className="flex min-h-[60vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-brand-500" />
       </section>
     );
   }
@@ -341,7 +382,7 @@ function NewBookingContent() {
 
             <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
               {step === 1 && (
-                <SelectTrekStep selectedTrek={selectedTrek} onSelect={selectTrek} />
+                <SelectTrekStep treks={treks} selectedTrek={selectedTrek} onSelect={selectTrek} />
               )}
 
               {step === 2 && selectedTrek && (
@@ -480,12 +521,25 @@ function StepProgress({ currentStep }: { currentStep: number }) {
   );
 }
 
-function SelectTrekStep({ selectedTrek, onSelect }: { selectedTrek: Trek | null; onSelect: (trek: Trek) => void }) {
+function SelectTrekStep({
+  treks,
+  selectedTrek,
+  onSelect,
+}: {
+  treks: Trek[];
+  selectedTrek: Trek | null;
+  onSelect: (trek: Trek) => void;
+}) {
   return (
     <div>
       <StepHeader title="Step 1: Select Trek" description="Pick the trek you want to book." />
+      {treks.length === 0 && (
+        <div className="mt-5 rounded-xl border border-border bg-background p-4 text-sm text-muted-foreground">
+          No treks are available for booking right now.
+        </div>
+      )}
       <div className="mt-5 grid gap-4 md:grid-cols-2">
-        {MOCK_TREKS.slice(0, 8).map((trek) => {
+        {treks.map((trek) => {
           const selected = selectedTrek?.id === trek.id;
           return (
             <button

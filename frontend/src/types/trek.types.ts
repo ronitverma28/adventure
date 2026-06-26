@@ -51,21 +51,21 @@ export interface Trek {
   coverImageUrl?: string;
   avgRating: number;
   totalReviews: number;
-  totalBookings: number;
+  totalBookings?: number;
   isFeatured: boolean;
   isBestseller: boolean;
-  status: TrekStatus;
+  status?: TrekStatus;
   startDate?: string;
   endDate?: string;
   bestSeason?: string[];
-  groupSizeMin: number;
-  groupSizeMax: number;
+  groupSizeMin?: number;
+  groupSizeMax?: number;
   highlights?: string[];
   images?: TrekImage[];
   itinerary?: ItineraryDay[];
   upcomingBatches?: TrekBatchDate[];
   routeMapUrl?: string;
-  createdAt: string;
+  createdAt?: string;
 }
 
 export interface TrekDetail extends Trek {
@@ -80,11 +80,13 @@ export interface TrekDetail extends Trek {
   longitude?: number;
   metaTitle?: string;
   metaDescription?: string;
+  guides?: TrekGuide[];
 }
 
 export interface TrekFilters {
   search?: string;
   state?: string;
+  region?: string;
   difficulty?: DifficultyLevel;
   minPrice?: number;
   maxPrice?: number;
@@ -93,7 +95,8 @@ export interface TrekFilters {
   minAltitude?: number;
   maxAltitude?: number;
   bestSeason?: string;
-  isFeatured?: boolean;
+  featured?: boolean;
+  bestseller?: boolean;
   sort?: SortOption;
 }
 
@@ -102,4 +105,42 @@ export interface TrekFilterOptions {
   maxPrice: number;
   maxDuration: number;
   maxAltitude: number;
+}
+
+export interface TrekGuide {
+  id: number;
+  name: string;
+  bio: string;
+  photoUrl?: string;
+  experienceYears?: number;
+  languages?: string[];
+  certifications?: string[];
+  specializations?: string[];
+  avgRating?: number;
+  isVerified?: boolean;
+}
+
+export interface TrekAvailability {
+  batchId: number;
+  trekId: number;
+  startDate: string;
+  endDate: string;
+  totalSlots: number;
+  availableSlots: number;
+  pricePerPerson: number;
+  meetingPoint?: string;
+}
+
+export interface RelatedTrek {
+  id: number;
+  title: string;
+  slug: string;
+  location: string;
+  state: string;
+  region?: string;
+  durationDays: number;
+  difficulty: DifficultyLevel;
+  pricePerPerson: number;
+  avgRating: number;
+  coverImageUrl?: string;
 }

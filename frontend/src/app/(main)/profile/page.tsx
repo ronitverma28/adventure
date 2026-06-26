@@ -17,6 +17,8 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { authApi } from '@/lib/api/auth.api';
 import { bookingApi } from '@/lib/api/booking.api';
+import { reviewApi } from '@/lib/api/reviews';
+import { trekApi } from '@/lib/api/trek.api';
 import {
   updateProfileSchema, changePasswordSchema,
   UpdateProfileFormData, ChangePasswordData,
@@ -37,7 +39,7 @@ type DashboardTab =
 interface ReviewForm {
   rating: number;
   title: string;
-  body: string;
+  comment: string;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -207,21 +209,35 @@ export default function DashboardPage() {
 
   // Review modal
   const [reviewBookingRef, setReviewBookingRef] = useState<string | null>(null);
-  const [reviewForm, setReviewForm] = useState<ReviewForm>({ rating: 5, title: '', body: '' });
+  const [reviewForm, setReviewForm] = useState<ReviewForm>({ rating: 5, title: '', comment: '' });
   const [submittingReview, setSubmittingReview] = useState(false);
 
   const submitReview = async () => {
-    if (!reviewForm.title.trim() || !reviewForm.body.trim()) {
+    if (!reviewBookingRef || !reviewForm.title.trim() || !reviewForm.comment.trim()) {
       toast.error('Please fill in all review fields');
       return;
     }
     setSubmittingReview(true);
-    // Optimistic — backend review endpoint wired in Phase 9
-    await new Promise((r) => setTimeout(r, 800));
-    toast.success('Review submitted! It will appear after approval.');
-    setReviewBookingRef(null);
-    setReviewForm({ rating: 5, title: '', body: '' });
-    setSubmittingReview(false);
+    try {
+      const booking = allBookings.find((item) => item.bookingRef === reviewBookingRef);
+      if (!booking?.trekSlug) throw new Error('Booking details unavailable');
+
+      const trekResponse = await trekApi.getBySlug(booking.trekSlug);
+      await reviewApi.create({
+        trekId: trekResponse.data.data.id,
+        rating: reviewForm.rating,
+        title: reviewForm.title,
+        comment: reviewForm.comment,
+      });
+
+      toast.success('Review submitted! It will appear after approval.');
+      setReviewBookingRef(null);
+      setReviewForm({ rating: 5, title: '', comment: '' });
+    } catch (err: any) {
+      toast.error(err?.response?.data?.error ?? err?.message ?? 'Review submission failed');
+    } finally {
+      setSubmittingReview(false);
+    }
   };
 
   // Fitness checklist
@@ -855,8 +871,8 @@ export default function DashboardPage() {
             <div className="mt-4">
               <label className="mb-1.5 block text-sm font-medium text-foreground">Your Review</label>
               <textarea
-                value={reviewForm.body}
-                onChange={(e) => setReviewForm((f) => ({ ...f, body: e.target.value }))}
+                value={reviewForm.comment}
+                onChange={(e) => setReviewForm((f) => ({ ...f, comment: e.target.value }))}
                 placeholder="Share your experience in detail..."
                 rows={4}
                 className="w-full resize-none rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-brand-500"

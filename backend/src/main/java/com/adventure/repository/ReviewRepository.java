@@ -9,6 +9,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     Page<Review> findByTrekId(Long trekId, Pageable pageable);
+    Page<Review> findByTrekIdAndIsApproved(Long trekId, Boolean isApproved, Pageable pageable);
+    Page<Review> findByUserId(Long userId, Pageable pageable);
     Page<Review> findByIsApproved(Boolean isApproved, Pageable pageable);
+    boolean existsByTrekIdAndUserId(Long trekId, Long userId);
     long countByIsApproved(Boolean isApproved);
+    long countByTrekIdAndIsApproved(Long trekId, Boolean isApproved);
+    long countByTrekIdAndIsApprovedAndRating(Long trekId, Boolean isApproved, Integer rating);
 }

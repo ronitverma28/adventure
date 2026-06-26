@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -9,12 +9,14 @@ import {
   CheckCircle2, Package, Dumbbell, ArrowRight, Loader2,
   ShieldCheck, Lightbulb, Check,
 } from 'lucide-react';
+import { trekApi } from '@/lib/api/trek.api';
 import { generateTrekPlan } from '@/lib/services/ai-planner.service';
 import { formatCurrency } from '@/lib/utils/formatters';
 import { cn } from '@/lib/utils/cn';
 import { DIFFICULTY_CONFIG } from '@/lib/constants/trek.constants';
 import type { PlannerInput, PlannerResult, TrekRecommendation } from '@/types/planner.types';
 import type { ExperienceLevel, FitnessLevel } from '@/types/planner.types';
+import type { Trek } from '@/types/trek.types';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -74,19 +76,39 @@ function ScoreBadge({ score }: { score: number }) {
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function PlannerPage() {
+  const [treks, setTreks] = useState<Trek[]>([]);
   const [step, setStep]       = useState(1);
   const [input, setInput]     = useState<PlannerInput>(DEFAULT_INPUT);
   const [result, setResult]   = useState<PlannerResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<TrekRecommendation | null>(null);
 
+  useEffect(() => {
+    let active = true;
+
+    async function loadTreks() {
+      try {
+        const response = await trekApi.getAll(undefined, 0, 100);
+        if (active) setTreks(response.data.data.content);
+      } catch {
+        if (active) setTreks([]);
+      }
+    }
+
+    loadTreks();
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const update = (patch: Partial<PlannerInput>) => setInput((p) => ({ ...p, ...patch }));
 
   const handleGenerate = async () => {
+    if (treks.length === 0) return;
     setLoading(true);
     // Simulate AI thinking delay for UX
     await new Promise((r) => setTimeout(r, 1400));
-    const plan = generateTrekPlan(input);
+    const plan = generateTrekPlan(treks, input);
     setResult(plan);
     setSelected(plan.recommendations[0] ?? null);
     setLoading(false);

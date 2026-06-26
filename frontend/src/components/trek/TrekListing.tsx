@@ -1,145 +1,142 @@
 'use client';
 
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Grid3X3, List, ChevronDown, X, SlidersHorizontal } from 'lucide-react';
+import { Search, Grid3X3, List, ChevronDown, X } from 'lucide-react';
 import { TrekCard } from './TrekCard';
 import { TrekFilterPanel } from './TrekFilterPanel';
 import { TrekGridSkeleton } from './TrekCardSkeleton';
 import { QuickViewModal } from './QuickViewModal';
 import { TrekPagination } from './TrekPagination';
-import { Trek, TrekFilters, SortOption } from '@/types/trek.types';
-import { SORT_OPTIONS, TREKS_PER_PAGE } from '@/lib/constants/trek.constants';
+import { trekApi } from '@/lib/api/treks';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { cn } from '@/lib/utils/cn';
+import type { Trek, TrekFilters, SortOption } from '@/types/trek.types';
+import type { PagedResponse } from '@/types/api.types';
+import { SORT_OPTIONS } from '@/lib/constants/trek.constants';
 
 interface TrekListingProps {
-  initialTreks: Trek[];
-  isLoading?: boolean;
+  initialTreks?: Trek[];
 }
 
-export function TrekListing({ initialTreks, isLoading = false }: TrekListingProps) {
+const DEFAULT_PAGED: PagedResponse<Trek> = {
+  content: [],
+  page: 0,
+  size: 12,
+  totalElements: 0,
+  totalPages: 0,
+  first: true,
+  last: true,
+};
+
+export function TrekListing({ initialTreks = [] }: TrekListingProps) {
   const [filters, setFilters] = useState<TrekFilters>({});
   const [searchInput, setSearchInput] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortOpen, setSortOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [quickViewTrek, setQuickViewTrek] = useState<Trek | null>(null);
+  const [loading, setLoading] = useState(initialTreks.length === 0);
+  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<PagedResponse<Trek>>({
+    ...DEFAULT_PAGED,
+    content: initialTreks,
+    totalElements: initialTreks.length,
+    totalPages: initialTreks.length > 0 ? 1 : 0,
+    last: true,
+    first: true,
+  });
 
   const debouncedSearch = useDebounce(searchInput, 350);
 
-  // Reset page on filter change
-  useEffect(() => { setCurrentPage(1); }, [filters, debouncedSearch]);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters, debouncedSearch]);
 
-  const handleFilterChange = useCallback((newFilters: TrekFilters) => {
-    setFilters(newFilters);
-  }, []);
+  useEffect(() => {
+    let active = true;
 
-  // Client-side filtering + sorting
-  const filteredTreks = useMemo(() => {
-    let result = [...initialTreks];
+    async function loadTreks() {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = debouncedSearch
+          ? await trekApi.search(debouncedSearch, currentPage - 1, 12)
+          : await trekApi.getAll({
+              search: debouncedSearch || filters.search,
+              state: filters.state,
+              region: filters.region,
+              difficulty: filters.difficulty,
+              minPrice: filters.minPrice,
+              maxPrice: filters.maxPrice,
+              bestSeason: filters.bestSeason,
+              featured: filters.featured,
+              bestseller: filters.bestseller,
+              sort: filters.sort,
+            }, currentPage - 1, 12);
 
-    // Search
-    if (debouncedSearch) {
-      const q = debouncedSearch.toLowerCase();
-      result = result.filter(
-        (t) =>
-          t.title.toLowerCase().includes(q) ||
-          t.location.toLowerCase().includes(q) ||
-          t.state.toLowerCase().includes(q) ||
-          t.shortDescription.toLowerCase().includes(q)
-      );
+        if (!active) return;
+        setResult(response.data.data);
+      } catch (err) {
+        if (!active) return;
+        setError(err instanceof Error ? err.message : 'Failed to load treks');
+        setResult(DEFAULT_PAGED);
+      } finally {
+        if (active) setLoading(false);
+      }
     }
 
-    // Difficulty
-    if (filters.difficulty) result = result.filter((t) => t.difficulty === filters.difficulty);
+    loadTreks();
+    return () => {
+      active = false;
+    };
+  }, [currentPage, debouncedSearch, filters]);
 
-    // State
-    if (filters.state) result = result.filter((t) => t.state === filters.state);
+  const currentSort = SORT_OPTIONS.find((option) => option.value === (filters.sort ?? 'popular'));
 
-    // Price
-    if (filters.minPrice !== undefined) result = result.filter((t) => t.pricePerPerson >= filters.minPrice!);
-    if (filters.maxPrice !== undefined) result = result.filter((t) => t.pricePerPerson <= filters.maxPrice!);
-
-    // Duration
-    if (filters.minDays !== undefined) result = result.filter((t) => t.durationDays >= filters.minDays!);
-    if (filters.maxDays !== undefined) result = result.filter((t) => t.durationDays <= filters.maxDays!);
-
-    // Altitude
-    if (filters.maxAltitude !== undefined)
-      result = result.filter((t) => !t.altitudeMax || t.altitudeMax <= filters.maxAltitude!);
-
-    // Season
-    if (filters.bestSeason)
-      result = result.filter((t) => t.bestSeason?.includes(filters.bestSeason!));
-
-    // Sort
-    switch (filters.sort) {
-      case 'price_asc': result.sort((a, b) => a.pricePerPerson - b.pricePerPerson); break;
-      case 'price_desc': result.sort((a, b) => b.pricePerPerson - a.pricePerPerson); break;
-      case 'rating': result.sort((a, b) => b.avgRating - a.avgRating); break;
-      case 'duration_asc': result.sort((a, b) => a.durationDays - b.durationDays); break;
-      case 'duration_desc': result.sort((a, b) => b.durationDays - a.durationDays); break;
-      case 'newest': result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()); break;
-      default: result.sort((a, b) => b.totalBookings - a.totalBookings); // popular
-    }
-
-    return result;
-  }, [initialTreks, debouncedSearch, filters]);
-
-  // Pagination
-  const totalPages = Math.ceil(filteredTreks.length / TREKS_PER_PAGE);
-  const paginatedTreks = filteredTreks.slice(
-    (currentPage - 1) * TREKS_PER_PAGE,
-    currentPage * TREKS_PER_PAGE
-  );
-
-  const currentSort = SORT_OPTIONS.find((o) => o.value === (filters.sort ?? 'popular'));
-
-  // Active filter chips
   const activeChips = useMemo(() => {
     const chips: { key: string; label: string }[] = [];
     if (filters.difficulty) chips.push({ key: 'difficulty', label: filters.difficulty });
     if (filters.state) chips.push({ key: 'state', label: filters.state });
-    if (filters.minPrice || filters.maxPrice)
-      chips.push({ key: 'price', label: `₹${(filters.minPrice ?? 0).toLocaleString()}–₹${(filters.maxPrice ?? 50000).toLocaleString()}` });
-    if (filters.minDays || filters.maxDays)
-      chips.push({ key: 'duration', label: `${filters.minDays ?? 1}–${filters.maxDays ?? 21} days` });
+    if (filters.minPrice || filters.maxPrice) {
+      chips.push({
+        key: 'price',
+        label: `INR ${(filters.minPrice ?? 0).toLocaleString()} - INR ${(filters.maxPrice ?? 50000).toLocaleString()}`,
+      });
+    }
     if (filters.bestSeason) chips.push({ key: 'bestSeason', label: filters.bestSeason });
-    if (filters.maxAltitude) chips.push({ key: 'maxAltitude', label: `Up to ${filters.maxAltitude.toLocaleString()}m` });
     return chips;
   }, [filters]);
 
   const removeChip = (key: string) => {
     const next = { ...filters };
-    if (key === 'price') { delete next.minPrice; delete next.maxPrice; }
-    else if (key === 'duration') { delete next.minDays; delete next.maxDays; }
-    else delete (next as Record<string, unknown>)[key];
+    if (key === 'price') {
+      delete next.minPrice;
+      delete next.maxPrice;
+    } else {
+      delete (next as Record<string, unknown>)[key];
+    }
     setFilters(next);
   };
 
   return (
     <>
       <div className="flex gap-6">
-        {/* Sidebar Filters */}
         <TrekFilterPanel
           filters={filters}
-          onChange={handleFilterChange}
-          totalResults={filteredTreks.length}
+          onChange={setFilters}
+          totalResults={result.totalElements}
         />
 
-        {/* Main Content */}
         <div className="min-w-0 flex-1">
-          {/* Toolbar */}
           <div className="mb-6 flex flex-col gap-3">
             <div className="flex flex-wrap items-center gap-3">
-              {/* Search */}
               <div className="relative flex-1">
                 <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type="text"
                   value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
+                  onChange={(event) => setSearchInput(event.target.value)}
                   placeholder="Search treks, destinations..."
                   className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-4 text-sm text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-brand-500 focus:ring-1 focus:ring-brand-500/20"
                 />
@@ -153,10 +150,9 @@ export function TrekListing({ initialTreks, isLoading = false }: TrekListingProp
                 )}
               </div>
 
-              {/* Sort */}
               <div className="relative">
                 <button
-                  onClick={() => setSortOpen((v) => !v)}
+                  onClick={() => setSortOpen((value) => !value)}
                   className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-muted"
                 >
                   <span className="hidden sm:inline">{currentSort?.label}</span>
@@ -172,18 +168,21 @@ export function TrekListing({ initialTreks, isLoading = false }: TrekListingProp
                       transition={{ duration: 0.15 }}
                       className="absolute right-0 top-full z-30 mt-2 w-52 overflow-hidden rounded-xl border border-border bg-card shadow-xl"
                     >
-                      {SORT_OPTIONS.map((opt) => (
+                      {SORT_OPTIONS.map((option) => (
                         <button
-                          key={opt.value}
-                          onClick={() => { setFilters((f) => ({ ...f, sort: opt.value as SortOption })); setSortOpen(false); }}
+                          key={option.value}
+                          onClick={() => {
+                            setFilters((current) => ({ ...current, sort: option.value as SortOption }));
+                            setSortOpen(false);
+                          }}
                           className={cn(
                             'flex w-full items-center px-4 py-2.5 text-sm transition-colors',
-                            filters.sort === opt.value || (!filters.sort && opt.value === 'popular')
+                            filters.sort === option.value || (!filters.sort && option.value === 'popular')
                               ? 'bg-brand-500/10 font-medium text-brand-600 dark:text-brand-400'
                               : 'text-foreground hover:bg-muted'
                           )}
                         >
-                          {opt.label}
+                          {option.label}
                         </button>
                       ))}
                     </motion.div>
@@ -192,7 +191,6 @@ export function TrekListing({ initialTreks, isLoading = false }: TrekListingProp
                 {sortOpen && <div className="fixed inset-0 z-20" onClick={() => setSortOpen(false)} />}
               </div>
 
-              {/* View toggle */}
               <div className="flex overflow-hidden rounded-xl border border-border bg-card">
                 {(['grid', 'list'] as const).map((mode) => (
                   <button
@@ -209,7 +207,6 @@ export function TrekListing({ initialTreks, isLoading = false }: TrekListingProp
               </div>
             </div>
 
-            {/* Active filter chips */}
             <AnimatePresence>
               {activeChips.length > 0 && (
                 <motion.div
@@ -242,22 +239,21 @@ export function TrekListing({ initialTreks, isLoading = false }: TrekListingProp
               )}
             </AnimatePresence>
 
-            {/* Results count */}
             <div className="text-sm text-muted-foreground">
-              Showing{' '}
-              <span className="font-semibold text-foreground">
-                {(currentPage - 1) * TREKS_PER_PAGE + 1}–
-                {Math.min(currentPage * TREKS_PER_PAGE, filteredTreks.length)}
-              </span>{' '}
-              of{' '}
-              <span className="font-semibold text-foreground">{filteredTreks.length}</span> treks
+              {loading ? 'Loading treks...' : (
+                <>
+                  Showing <span className="font-semibold text-foreground">{result.content.length}</span> of{' '}
+                  <span className="font-semibold text-foreground">{result.totalElements}</span> treks
+                </>
+              )}
             </div>
           </div>
 
-          {/* Trek Grid/List */}
-          {isLoading ? (
-            <TrekGridSkeleton count={TREKS_PER_PAGE} viewMode={viewMode} />
-          ) : filteredTreks.length === 0 ? (
+          {loading ? (
+            <TrekGridSkeleton count={12} viewMode={viewMode} />
+          ) : error ? (
+            <ErrorState message={error} onRetry={() => setCurrentPage((page) => page)} />
+          ) : result.content.length === 0 ? (
             <EmptyState onReset={() => { setFilters({}); setSearchInput(''); }} />
           ) : (
             <motion.div
@@ -269,7 +265,7 @@ export function TrekListing({ initialTreks, isLoading = false }: TrekListingProp
               )}
             >
               <AnimatePresence mode="popLayout">
-                {paginatedTreks.map((trek) => (
+                {result.content.map((trek) => (
                   <TrekCard
                     key={trek.id}
                     trek={trek}
@@ -281,12 +277,11 @@ export function TrekListing({ initialTreks, isLoading = false }: TrekListingProp
             </motion.div>
           )}
 
-          {/* Pagination */}
-          {totalPages > 1 && (
+          {result.totalPages > 1 && (
             <div className="mt-10">
               <TrekPagination
                 currentPage={currentPage}
-                totalPages={totalPages}
+                totalPages={result.totalPages}
                 onPageChange={setCurrentPage}
               />
             </div>
@@ -294,7 +289,6 @@ export function TrekListing({ initialTreks, isLoading = false }: TrekListingProp
         </div>
       </div>
 
-      {/* Quick View Modal */}
       <QuickViewModal trek={quickViewTrek} onClose={() => setQuickViewTrek(null)} />
     </>
   );
@@ -307,7 +301,6 @@ function EmptyState({ onReset }: { onReset: () => void }) {
       animate={{ opacity: 1, y: 0 }}
       className="flex flex-col items-center justify-center py-24 text-center"
     >
-      <div className="mb-4 text-6xl">🏔️</div>
       <h3 className="font-display text-xl font-bold text-foreground">No treks found</h3>
       <p className="mt-2 max-w-sm text-sm text-muted-foreground">
         Try adjusting your filters or search query to discover more adventures.
@@ -319,5 +312,20 @@ function EmptyState({ onReset }: { onReset: () => void }) {
         Reset Filters
       </button>
     </motion.div>
+  );
+}
+
+function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center dark:border-red-900 dark:bg-red-950/20">
+      <h3 className="font-display text-xl font-bold text-foreground">Unable to load treks</h3>
+      <p className="mt-2 text-sm text-muted-foreground">{message}</p>
+      <button
+        onClick={onRetry}
+        className="mt-6 rounded-xl bg-brand-500 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
+      >
+        Retry
+      </button>
+    </div>
   );
 }

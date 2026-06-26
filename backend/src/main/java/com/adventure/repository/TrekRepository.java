@@ -5,6 +5,7 @@ import com.adventure.enums.DifficultyLevel;
 import com.adventure.enums.TrekStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,13 +16,21 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface TrekRepository extends JpaRepository<Trek, Long> {
+public interface TrekRepository extends JpaRepository<Trek, Long>, JpaSpecificationExecutor<Trek> {
 
     Optional<Trek> findBySlug(String slug);
+
+    Optional<Trek> findByIdAndStatus(Long id, TrekStatus status);
+
+    Optional<Trek> findBySlugAndStatus(String slug, TrekStatus status);
 
     Page<Trek> findByStatus(TrekStatus status, Pageable pageable);
 
     List<Trek> findByIsFeaturedTrueAndStatus(TrekStatus status);
+
+    Page<Trek> findByIsFeaturedTrueAndStatus(TrekStatus status, Pageable pageable);
+
+    Page<Trek> findByIsBestsellerTrueAndStatus(TrekStatus status, Pageable pageable);
 
     @Query("""
         SELECT t FROM Trek t

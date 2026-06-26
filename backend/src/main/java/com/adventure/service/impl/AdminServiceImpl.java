@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -246,14 +247,22 @@ public class AdminServiceImpl implements AdminService {
         Review review = reviewRepository.findById(reviewId)
             .orElseThrow(() -> new ResourceNotFoundException("Review", reviewId));
         review.setIsApproved(!Boolean.TRUE.equals(review.getIsApproved()));
-        return toAdminReviewResponse(reviewRepository.save(review));
+        Review saved = reviewRepository.save(review);
+        updateTrekRating(review.getTrek());
+        return toAdminReviewResponse(saved);
     }
 
     @Override
     public void deleteReview(Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
             .orElseThrow(() -> new ResourceNotFoundException("Review", reviewId));
+        Trek trek = review.getTrek();
+        boolean wasApproved = Boolean.TRUE.equals(review.getIsApproved());
         reviewRepository.delete(review);
+        if (wasApproved) {
+            reviewRepository.flush();
+            updateTrekRating(trek);
+        }
     }
 
     // ── Coupon management ─────────────────────────────────────────────────────
@@ -418,6 +427,20 @@ public class AdminServiceImpl implements AdminService {
             .totalElements(page.getTotalElements()).totalPages(page.getTotalPages())
             .first(page.isFirst()).last(page.isLast())
             .build();
+    }
+
+    private void updateTrekRating(Trek trek) {
+        long totalReviews = reviewRepository.countByTrekIdAndIsApproved(trek.getId(), true);
+        long weightedTotal = 0;
+        for (int rating = 1; rating <= 5; rating++) {
+            weightedTotal += (long) rating * reviewRepository.countByTrekIdAndIsApprovedAndRating(trek.getId(), true, rating);
+        }
+
+        trek.setTotalReviews((int) totalReviews);
+        trek.setAvgRating(totalReviews == 0
+            ? BigDecimal.ZERO
+            : BigDecimal.valueOf(weightedTotal).divide(BigDecimal.valueOf(totalReviews), 2, RoundingMode.HALF_UP));
+        trekRepository.save(trek);
     }
 
     private String slugify(String text) {

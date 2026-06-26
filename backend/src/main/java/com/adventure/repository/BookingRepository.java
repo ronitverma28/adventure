@@ -23,6 +23,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     Optional<Booking> findByBookingRef(String bookingRef);
     Optional<Booking> findByBookingRefAndUserId(String bookingRef, Long userId);
+    boolean existsByUserIdAndTrekIdAndStatus(Long userId, Long trekId, BookingStatus status);
 
     List<Booking> findByTrekIdAndTrekDateAndStatusIn(
         Long trekId, LocalDate trekDate, List<BookingStatus> statuses

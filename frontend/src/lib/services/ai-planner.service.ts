@@ -1,4 +1,3 @@
-import { MOCK_TREKS } from '@/lib/data/mock-treks';
 import type {
   PlannerInput, PlannerResult, TrekRecommendation,
   PreparationPlan, PackingCategory,
@@ -275,8 +274,8 @@ function buildPackingList(trek: Trek, input: PlannerInput): PackingCategory[] {
 
 // ─── Main planner function ────────────────────────────────────────────────────
 
-export function generateTrekPlan(input: PlannerInput): PlannerResult {
-  const scored = MOCK_TREKS
+export function generateTrekPlan(treks: Trek[], input: PlannerInput): PlannerResult {
+  const scored = treks
     .filter((t) => t.status === 'ACTIVE')
     .map((trek) => ({
       trek,

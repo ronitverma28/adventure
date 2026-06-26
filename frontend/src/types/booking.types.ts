@@ -2,6 +2,7 @@ export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' 
 export type PaymentStatus = 'PENDING' | 'SUCCESS' | 'FAILED' | 'REFUNDED' | 'PARTIALLY_REFUNDED';
 export type PaymentGateway = 'RAZORPAY' | 'STRIPE';
 export type PaymentMethod = 'CARD' | 'UPI' | 'NET_BANKING' | 'WALLET' | 'EMI';
+export type DiscountType = 'PERCENTAGE' | 'FLAT';
 
 export interface Traveler {
   id?: number;
@@ -85,25 +86,67 @@ export interface PaymentHistory {
 }
 
 export interface RazorpayOrder {
+  gateway: PaymentGateway;
   orderId: string;
   amount: number;
   currency: string;
   keyId: string;
+  checkoutUrl?: string;
+  clientSecret?: string;
+  status?: string;
+  bookingRef?: string;
+  paymentId?: number;
 }
 
 export interface CouponValidation {
   valid: boolean;
   code: string;
-  discountType: 'PERCENTAGE' | 'FLAT';
+  discountType: DiscountType;
   discountValue: number;
   discountAmount: number;
   message: string;
 }
 
-export interface ReviewRequest {
+export interface CreateOrderRequest {
   trekId: number;
-  bookingRef: string;
-  rating: number;
-  title: string;
-  body: string;
+  batchId?: number;
+  startDate?: string;
+  endDate?: string;
+  numAdults: number;
+  numChildren: number;
+  couponCode?: string;
+  paymentGateway?: PaymentGateway;
+  travelers?: Traveler[];
+  emergencyContact?: string;
+  emergencyPhone?: string;
+  pickupLocation?: string;
+  specialRequests?: string;
+}
+
+export interface ConfirmBookingRequest {
+  razorpayOrderId?: string;
+  razorpayPaymentId?: string;
+  razorpaySignature?: string;
+  paymentGateway?: PaymentGateway;
+  paymentOrderId?: string;
+  paymentId?: string;
+  paymentSignature?: string;
+  trekId: number;
+  batchId?: number;
+  startDate?: string;
+  endDate?: string;
+  numAdults: number;
+  numChildren: number;
+  travelers: Traveler[];
+  emergencyContact: string;
+  emergencyPhone: string;
+  pickupLocation?: string;
+  specialRequests?: string;
+  couponCode?: string;
+}
+
+export interface ValidateCouponRequest {
+  code: string;
+  trekId: number;
+  amount: number;
 }
