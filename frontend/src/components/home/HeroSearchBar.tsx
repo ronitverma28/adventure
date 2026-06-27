@@ -225,7 +225,7 @@ export function HeroSearchBar() {
                         </div>
                       )}
 
-                      {/* Difficulty */}
+                      {/* Difficulty
                       {field.key === 'difficulty' && (
                         <div className="p-2">
                           {DIFFICULTIES.map((d) => (
@@ -247,10 +247,10 @@ export function HeroSearchBar() {
                             </button>
                           ))}
                         </div>
-                      )}
+                      )} */}
 
                       {/* Duration */}
-                      {field.key === 'duration' && (
+                      {/* {field.key === 'duration' && (
                         <div className="p-2">
                           {DURATIONS.map((d) => (
                             <button
@@ -271,7 +271,7 @@ export function HeroSearchBar() {
                             </button>
                           ))}
                         </div>
-                      )}
+                      )} */}
 
                       {/* Budget */}
                       {field.key === 'budget' && (

@@ -114,7 +114,7 @@ export function TrekFilterPanel({ filters, onChange, totalResults }: TrekFilters
         </span>
       </div>
 
-      {/* Difficulty */}
+      {/* Difficulty
       <FilterSection id="difficulty" label="Difficulty" icon={TrendingUp}>
         <div className="grid grid-cols-2 gap-2">
           {(Object.keys(DIFFICULTY_CONFIG) as DifficultyLevel[]).map((level) => {
@@ -137,7 +137,7 @@ export function TrekFilterPanel({ filters, onChange, totalResults }: TrekFilters
             );
           })}
         </div>
-      </FilterSection>
+      </FilterSection> */}
 
       {/* State */}
       <FilterSection id="state" label="Destination" icon={MapPin}>

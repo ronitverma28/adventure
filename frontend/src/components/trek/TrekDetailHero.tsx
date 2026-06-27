@@ -56,8 +56,8 @@ export function TrekDetailHero({ trek }: { trek: Trek }) {
             <h1 className="font-display text-4xl font-bold text-white sm:text-5xl">{trek.title}</h1>
             <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-white/80">
               <span className="flex items-center gap-1.5"><MapPin className="h-4 w-4" />{trek.location}</span>
-              <span className="flex items-center gap-1.5"><Star className="h-4 w-4 fill-brand-400 text-brand-400" />{trek.avgRating} ({trek.totalReviews.toLocaleString()} reviews)</span>
-              <span className="flex items-center gap-1.5"><Users className="h-4 w-4" />{trek.totalBookings.toLocaleString()} trekkers</span>
+              <span className="flex items-center gap-1.5"><Star className="h-4 w-4 fill-brand-400 text-brand-400" />{trek.avgRating} ({trek.totalReviews?.toLocaleString()} reviews)</span>
+              <span className="flex items-center gap-1.5"><Users className="h-4 w-4" />{trek.totalBookings ? trek.totalBookings.toLocaleString() : '0'} trekkers</span>
             </div>
           </div>
         </div>

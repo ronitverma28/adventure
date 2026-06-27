@@ -3,7 +3,7 @@ import { Mountain, Home, Map, Heart, User, LayoutDashboard, BookOpen } from 'luc
 export const mainNavLinks = [
   { label: 'Home', href: '/' },
   { label: 'Treks', href: '/treks' },
-  { label: 'AI Planner', href: '/planner' },
+  // { label: 'AI Planner', href: '/planner' },
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
 ];
