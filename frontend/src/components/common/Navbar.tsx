@@ -24,9 +24,15 @@ export function Navbar() {
 
   const isHomePage = pathname === '/';
   const hasSolidNavbar = scrolled || !isHomePage;
-  const navTextColor = hasSolidNavbar ? 'text-black/80 hover:bg-black/10 hover:text-black' : 'text-white/80 hover:bg-white/10 hover:text-white';
-  const brandTextColor = hasSolidNavbar ? 'text-black' : 'text-white';
-  const mobileToggleColor = hasSolidNavbar ? 'text-black/80 hover:bg-black/10' : 'text-white/80 hover:bg-white/10';
+
+  // On transparent (hero): white text. On solid dark navbar: light text
+  const navTextColor = hasSolidNavbar
+    ? 'text-white/75 hover:bg-white/10 hover:text-white'
+    : 'text-white/80 hover:bg-white/10 hover:text-white';
+
+  const brandTextColor = 'text-white';
+
+  const mobileToggleColor = 'text-white/80 hover:bg-white/10 hover:text-white';
 
   return (
     <>
@@ -37,16 +43,16 @@ export function Navbar() {
         className={cn(
           'fixed left-0 right-0 top-0 z-50 transition-all duration-500',
           hasSolidNavbar
-            ? 'border-b border-white/10 bg-mountain-900/95 shadow-lg shadow-black/20 backdrop-blur-xl'
+            ? 'border-b border-black/10 bg-transparent backdrop-blur-md'
             : 'bg-transparent'
         )}
       >
         <div className="container">
-          <div className="flex h-16 items-center justify-between md:h-20">
+          <div className="flex h-16 items-center justify-between md:h-16">
             {/* Logo */}
             <a href="/" className="group flex items-center gap-2.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500 shadow-lg shadow-brand-500/30 transition-transform group-hover:scale-105">
-                <Mountain className="h-5 w-5 text-black" />
+                <Mountain className="h-5 w-5 text-white" />
               </div>
               <span className={cn('font-display text-xl font-bold', brandTextColor)}>
                 Adventure
@@ -59,7 +65,11 @@ export function Navbar() {
                 <a
                   key={link.href}
                   href={link.href}
-                  className={cn('rounded-lg px-4 py-2 text-sm font-medium transition-colors', navTextColor)}
+                  className={cn(
+                    'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+                    navTextColor,
+                    pathname === link.href && 'text-brand-400 bg-white/5'
+                  )}
                 >
                   {link.label}
                 </a>
@@ -68,17 +78,12 @@ export function Navbar() {
 
             {/* Right Actions */}
             <div className="flex items-center gap-2">
-              {/* Search */}
-              {/* <button className="hidden h-9 w-9 items-center justify-center rounded-lg text-white/70 transition-colors hover:bg-white/10 hover:text-white md:flex">
-                <Search className="h-4 w-4" />
-              </button> */}
-
               {isAuthenticated ? (
                 <>
                   {/* Wishlist */}
                   <a
                     href="/wishlist"
-                    className={cn('hidden h-9 w-9 items-center justify-center rounded-lg transition-colors md:flex', hasSolidNavbar ? 'text-black/70 hover:bg-black/10 hover:text-black' : 'text-white/70 hover:bg-white/10 hover:text-white')}
+                    className="hidden h-9 w-9 items-center justify-center rounded-lg text-white/70 transition-colors hover:bg-white/10 hover:text-white md:flex"
                   >
                     <Heart className="h-4 w-4" />
                   </a>
@@ -87,7 +92,7 @@ export function Navbar() {
                   <div className="relative">
                     <button
                       onClick={() => setUserMenuOpen((v) => !v)}
-                      className="flex items-center gap-2 rounded-xl border border-black/20 bg-white/10 px-3 py-1.5 text-sm font-medium text-black backdrop-blur-sm transition-colors hover:bg-white/20"
+                      className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3 py-1.5 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/20"
                     >
                       {user?.avatarUrl ? (
                         <img
@@ -96,7 +101,7 @@ export function Navbar() {
                           className="h-6 w-6 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-500 text-xs font-bold">
+                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-500 text-xs font-bold text-white">
                           {user?.name?.[0]?.toUpperCase()}
                         </div>
                       )}
@@ -116,11 +121,11 @@ export function Navbar() {
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 8, scale: 0.97 }}
                           transition={{ duration: 0.15 }}
-                          className="absolute right-0 top-full mt-2 w-52 overflow-hidden rounded-xl border border-black/10 bg-mountain-900/95 shadow-2xl backdrop-blur-xl"
+                          className="absolute right-0 top-full mt-2 w-52 overflow-hidden rounded-xl border border-white/10 bg-mountain-900/95 shadow-2xl backdrop-blur-xl"
                         >
-                          <div className="border-b border-black/10 px-4 py-3">
-                            <div className="text-sm font-semibold text-black">{user?.name}</div>
-                            <div className="text-xs text-black/50">{user?.email}</div>
+                          <div className="border-b border-white/10 px-4 py-3">
+                            <div className="text-sm font-semibold text-white">{user?.name}</div>
+                            <div className="text-xs text-white/50">{user?.email}</div>
                           </div>
                           {[
                             { label: 'My Bookings', href: '/bookings' },
@@ -133,13 +138,13 @@ export function Navbar() {
                             <a
                               key={item.href}
                               href={item.href}
-                              className="block px-4 py-2.5 text-sm text-black/80 transition-colors hover:bg-black/10 hover:text-black"
+                              className="block px-4 py-2.5 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
                             >
                               {item.label}
                             </a>
                           ))}
-                          <div className="border-t border-black/10">
-                            <button className="block w-full px-4 py-2.5 text-left text-sm text-red-400 transition-colors hover:bg-black/10">
+                          <div className="border-t border-white/10">
+                            <button className="block w-full px-4 py-2.5 text-left text-sm text-red-400 transition-colors hover:bg-white/10 hover:text-red-300">
                               Sign Out
                             </button>
                           </div>
@@ -152,23 +157,23 @@ export function Navbar() {
                 <div className="flex items-center gap-2">
                   <a
                     href="/login"
-                    className={cn('hidden rounded-lg px-4 py-2 text-sm font-medium transition-colors sm:block', navTextColor)}
+                    className={cn(
+                      'hidden rounded-lg px-4 py-2 text-sm font-medium transition-colors sm:block',
+                      navTextColor
+                    )}
                   >
                     Sign In
                   </a>
-                  {/* <a
-                    href="/register"
-                    className="rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-brand-500/30 transition-all hover:bg-brand-600 hover:-translate-y-0.5"
-                  >
-                    Get Started
-                  </a> */}
                 </div>
               )}
 
               {/* Mobile Menu Toggle */}
               <button
                 onClick={toggleMobileMenu}
-                className={cn('flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:hidden', mobileToggleColor)}
+                className={cn(
+                  'flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:hidden',
+                  mobileToggleColor
+                )}
               >
                 {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </button>
@@ -196,7 +201,10 @@ export function Navbar() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.05 }}
                   onClick={toggleMobileMenu}
-                  className="rounded-xl px-4 py-3.5 text-base font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                  className={cn(
+                    'rounded-xl px-4 py-3.5 text-base font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white',
+                    pathname === link.href && 'bg-white/10 text-brand-400'
+                  )}
                 >
                   {link.label}
                 </motion.a>
@@ -206,25 +214,31 @@ export function Navbar() {
                   <>
                     <a
                       href="/login"
-                      className="rounded-xl border border-black/20 px-4 py-3 text-center text-sm font-semibold text-black"
+                      className="rounded-xl border border-white/20 px-4 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-white/10"
                     >
                       Sign In
                     </a>
                     <a
                       href="/register"
-                      className="rounded-xl bg-brand-500 px-4 py-3 text-center text-sm font-semibold text-white"
+                      className="rounded-xl bg-brand-500 px-4 py-3 text-center text-sm font-semibold text-white shadow-lg shadow-brand-500/30 transition-colors hover:bg-brand-600"
                     >
                       Get Started
                     </a>
                   </>
                 ) : (
                   <>
-                    <a href="/bookings" className="rounded-xl px-4 py-3 text-sm font-medium text-white/80">
+                    <a href="/bookings" className="rounded-xl px-4 py-3 text-sm font-medium text-white/80 hover:bg-white/10 hover:text-white transition-colors">
                       My Bookings
                     </a>
-                    <a href="/profile" className="rounded-xl px-4 py-3 text-sm font-medium text-white/80">
+                    <a href="/wishlist" className="rounded-xl px-4 py-3 text-sm font-medium text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+                      Wishlist
+                    </a>
+                    <a href="/profile" className="rounded-xl px-4 py-3 text-sm font-medium text-white/80 hover:bg-white/10 hover:text-white transition-colors">
                       Profile
                     </a>
+                    <button className="rounded-xl px-4 py-3 text-left text-sm font-medium text-red-400 hover:bg-white/10 transition-colors">
+                      Sign Out
+                    </button>
                   </>
                 )}
               </div>
@@ -233,7 +247,7 @@ export function Navbar() {
         )}
       </AnimatePresence>
 
-      {/* Backdrop */}
+      {/* Backdrop for user menu */}
       {userMenuOpen && (
         <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
       )}

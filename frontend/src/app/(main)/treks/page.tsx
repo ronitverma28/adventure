@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function TreksPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pt-16">
       <div className="border-b border-border bg-muted/30">
         <div className="container py-10">
           <div className="flex flex-col gap-2">

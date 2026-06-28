@@ -85,7 +85,7 @@ export default function MyBookingsPage() {
   }
 
   return (
-    <section className="min-h-screen bg-background py-8">
+    <section className="min-h-screen bg-background pt-16 pb-8">
       <div className="mx-auto max-w-5xl px-4">
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
