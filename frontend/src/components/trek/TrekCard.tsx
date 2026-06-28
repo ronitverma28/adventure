@@ -52,11 +52,10 @@ export function TrekCard({ trek, onQuickView, viewMode = 'grid' }: TrekCardProps
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      whileHover={{ y: -6 }}
       transition={{ duration: 0.3 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-2xl hover:shadow-black/10"
+      className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:shadow-2xl hover:shadow-black/10 hover:-translate-y-1"
     >
       {/* ── Image ── */}
       <div className="relative h-56 overflow-hidden">
@@ -126,86 +125,85 @@ export function TrekCard({ trek, onQuickView, viewMode = 'grid' }: TrekCardProps
           </div>
         )}
 
-        {/* Hover overlay — itinerary preview */}
-        <AnimatePresence>
-          {isHovered && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.25 }}
-              className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/90 via-black/60 to-black/20 p-4"
-            >
-              <div className="mb-3">
-                <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-white/60">
-                  Quick Itinerary
-                </p>
-                <div className="space-y-1">
-                  {trek.itinerary?.slice(0, 3).map((day) => (
-                    <div key={day.id} className="flex items-start gap-2">
-                      <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-brand-500/80 text-[9px] font-bold text-white">
-                        {day.dayNumber}
-                      </span>
-                      <span className="text-xs text-white/80 leading-tight">{day.title}</span>
-                    </div>
-                  ))}
-                  {(trek.itinerary?.length ?? 0) > 3 && (
-                    <div className="flex items-center gap-1 pl-6 text-[10px] text-white/50">
-                      <ChevronRight className="h-3 w-3" />
-                      +{(trek.itinerary?.length ?? 0) - 3} more days
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Upcoming dates */}
-              {trek.upcomingBatches && trek.upcomingBatches.length > 0 && (
-                <div className="mb-3">
-                  <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-white/60">
-                    Next Batches
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {trek.upcomingBatches.slice(0, 2).map((batch) => (
-                      <span
-                        key={batch.id}
-                        className={cn(
-                          'rounded-lg px-2 py-1 text-[10px] font-medium',
-                          batch.availableSeats === 0
-                            ? 'bg-gray-700/80 text-gray-400 line-through'
-                            : 'bg-white/15 text-white'
-                        )}
-                      >
-                        {formatDate(batch.startDate, 'dd MMM')}
-                        {batch.availableSeats > 0 && (
-                          <span className="ml-1 text-white/50">· {batch.availableSeats} seats</span>
-                        )}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Action buttons */}
-              <div className="flex gap-2">
-                <button
-                  onClick={(e) => { e.preventDefault(); onQuickView(trek); }}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-white/30 bg-white/10 py-2 text-xs font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
-                >
-                  <Eye className="h-3.5 w-3.5" />
-                  Quick View
-                </button>
-                <a
-                  href={`/treks/${trek.slug}`}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-brand-500 py-2 text-xs font-semibold text-white transition-colors hover:bg-brand-600"
-                >
-                  Book Now
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </a>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
+
+      {/* ── Hover overlay — covers full card ── */}
+      <AnimatePresence>
+        {isHovered && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0 z-10 flex flex-col justify-end bg-gradient-to-t from-black/95 via-black/70 to-black/30 p-4"
+          >
+            <div className="mb-3">
+              <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-white/60">
+                Quick Itinerary
+              </p>
+              <div className="space-y-1">
+                {trek.itinerary?.slice(0, 3).map((day) => (
+                  <div key={day.id} className="flex items-start gap-2">
+                    <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-brand-500/80 text-[9px] font-bold text-white">
+                      {day.dayNumber}
+                    </span>
+                    <span className="text-xs text-white/80 leading-tight">{day.title}</span>
+                  </div>
+                ))}
+                {(trek.itinerary?.length ?? 0) > 3 && (
+                  <div className="flex items-center gap-1 pl-6 text-[10px] text-white/50">
+                    <ChevronRight className="h-3 w-3" />
+                    +{(trek.itinerary?.length ?? 0) - 3} more days
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {trek.upcomingBatches && trek.upcomingBatches.length > 0 && (
+              <div className="mb-3">
+                <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-white/60">
+                  Next Batches
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {trek.upcomingBatches.slice(0, 2).map((batch) => (
+                    <span
+                      key={batch.id}
+                      className={cn(
+                        'rounded-lg px-2 py-1 text-[10px] font-medium',
+                        batch.availableSeats === 0
+                          ? 'bg-gray-700/80 text-gray-400 line-through'
+                          : 'bg-white/15 text-white'
+                      )}
+                    >
+                      {formatDate(batch.startDate, 'dd MMM')}
+                      {batch.availableSeats > 0 && (
+                        <span className="ml-1 text-white/50">· {batch.availableSeats} seats</span>
+                      )}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-2">
+              <button
+                onClick={(e) => { e.preventDefault(); onQuickView(trek); }}
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-white/30 bg-white/10 py-2.5 text-xs font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+              >
+                <Eye className="h-3.5 w-3.5" />
+                Quick View
+              </button>
+              <a
+                href={`/treks/${trek.slug}`}
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-brand-500 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-brand-600"
+              >
+                Book Now
+                <ArrowRight className="h-3.5 w-3.5" />
+              </a>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── Content ── */}
       <div className="flex flex-1 flex-col p-5">

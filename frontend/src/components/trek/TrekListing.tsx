@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Grid3X3, List, ChevronDown, X } from 'lucide-react';
+import { Search, Grid3X3, List, ChevronDown, X, FlaskConical } from 'lucide-react';
 import { TrekCard } from './TrekCard';
 import { TrekFilterPanel } from './TrekFilterPanel';
 import { TrekGridSkeleton } from './TrekCardSkeleton';
@@ -37,7 +37,7 @@ export function TrekListing({ initialTreks = [] }: TrekListingProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [quickViewTrek, setQuickViewTrek] = useState<Trek | null>(null);
   const [loading, setLoading] = useState(initialTreks.length === 0);
-  const [error, setError] = useState<string | null>(null);
+  const [usingMockData, setUsingMockData] = useState(false);
   const [result, setResult] = useState<PagedResponse<Trek>>({
     ...DEFAULT_PAGED,
     content: initialTreks,
@@ -58,7 +58,6 @@ export function TrekListing({ initialTreks = [] }: TrekListingProps) {
 
     async function loadTreks() {
       setLoading(true);
-      setError(null);
       try {
         const response = debouncedSearch
           ? await trekApi.search(debouncedSearch, currentPage - 1, 12)
@@ -77,10 +76,50 @@ export function TrekListing({ initialTreks = [] }: TrekListingProps) {
 
         if (!active) return;
         setResult(response.data.data);
-      } catch (err) {
+        setUsingMockData(false);
+      } catch {
         if (!active) return;
-        setError(err instanceof Error ? err.message : 'Failed to load treks');
-        setResult(DEFAULT_PAGED);
+        // API unavailable — fall back to mock data with client-side filtering
+        const { MOCK_TREKS } = await import('@/lib/data/mock-treks');
+        const PAGE_SIZE = 12;
+        const query = (debouncedSearch || filters.search || '').toLowerCase();
+
+        let filtered = MOCK_TREKS.filter((trek) => {
+          if (query && !trek.title.toLowerCase().includes(query) &&
+              !trek.location.toLowerCase().includes(query) &&
+              !(trek.state ?? '').toLowerCase().includes(query)) return false;
+          if (filters.difficulty && trek.difficulty !== filters.difficulty) return false;
+          if (filters.state && trek.state !== filters.state) return false;
+          if (filters.minPrice && trek.pricePerPerson < filters.minPrice) return false;
+          if (filters.maxPrice && trek.pricePerPerson > filters.maxPrice) return false;
+          if (filters.bestSeason && !trek.bestSeason?.includes(filters.bestSeason)) return false;
+          if (filters.featured && !trek.isFeatured) return false;
+          if (filters.bestseller && !trek.isBestseller) return false;
+          return true;
+        });
+
+        const sort = filters.sort ?? 'popular';
+        if (sort === 'price_asc') filtered.sort((a, b) => a.pricePerPerson - b.pricePerPerson);
+        else if (sort === 'price_desc') filtered.sort((a, b) => b.pricePerPerson - a.pricePerPerson);
+        else if (sort === 'rating') filtered.sort((a, b) => (b.avgRating ?? 0) - (a.avgRating ?? 0));
+        else if (sort === 'duration_asc') filtered.sort((a, b) => a.durationDays - b.durationDays);
+        else filtered.sort((a, b) => (b.totalBookings ?? 0) - (a.totalBookings ?? 0));
+
+        const totalElements = filtered.length;
+        const totalPages = Math.ceil(totalElements / PAGE_SIZE);
+        const start = (currentPage - 1) * PAGE_SIZE;
+        const content = filtered.slice(start, start + PAGE_SIZE);
+
+        setResult({
+          content,
+          page: currentPage - 1,
+          size: PAGE_SIZE,
+          totalElements,
+          totalPages,
+          first: currentPage === 1,
+          last: currentPage >= totalPages,
+        });
+        setUsingMockData(true);
       } finally {
         if (active) setLoading(false);
       }
@@ -239,6 +278,21 @@ export function TrekListing({ initialTreks = [] }: TrekListingProps) {
               )}
             </AnimatePresence>
 
+            {/* Demo data banner */}
+            <AnimatePresence>
+              {usingMockData && (
+                <motion.div
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  className="flex items-center gap-2 rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-2.5 text-xs font-medium text-amber-700 dark:text-amber-400"
+                >
+                  <FlaskConical className="h-3.5 w-3.5 shrink-0" />
+                  Showing demo data &mdash; API is currently unavailable. Filters &amp; search work locally.
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <div className="text-sm text-muted-foreground">
               {loading ? 'Loading treks...' : (
                 <>
@@ -251,8 +305,6 @@ export function TrekListing({ initialTreks = [] }: TrekListingProps) {
 
           {loading ? (
             <TrekGridSkeleton count={12} viewMode={viewMode} />
-          ) : error ? (
-            <ErrorState message={error} onRetry={() => setCurrentPage((page) => page)} />
           ) : result.content.length === 0 ? (
             <EmptyState onReset={() => { setFilters({}); setSearchInput(''); }} />
           ) : (
@@ -315,17 +367,3 @@ function EmptyState({ onReset }: { onReset: () => void }) {
   );
 }
 
-function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
-  return (
-    <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center dark:border-red-900 dark:bg-red-950/20">
-      <h3 className="font-display text-xl font-bold text-foreground">Unable to load treks</h3>
-      <p className="mt-2 text-sm text-muted-foreground">{message}</p>
-      <button
-        onClick={onRetry}
-        className="mt-6 rounded-xl bg-brand-500 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
-      >
-        Retry
-      </button>
-    </div>
-  );
-}
