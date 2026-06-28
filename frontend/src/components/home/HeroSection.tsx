@@ -57,6 +57,7 @@ export function HeroSection() {
   return (
     <section
       ref={containerRef}
+<<<<<<< HEAD
       className="relative h-screen min-h-[700px] bg-mountain-900"
     >
       {/* ── Background layers wrapped in overflow-hidden so parallax stays clipped ── */}
@@ -100,6 +101,48 @@ export function HeroSection() {
           }}
         />
       </div>
+=======
+      className="relative h-screen min-h-[700px] overflow-hidden bg-mountain-900"
+    >
+      {/* ── Parallax Background Slides ── */}
+      <motion.div
+        style={{ y, scale }}
+        className="absolute inset-0 will-change-transform"
+      >
+        <AnimatePresence mode="sync">
+          {BG_SLIDES.map((slide, i) =>
+            i === currentSlide ? (
+              <motion.div
+                key={slide.url}
+                initial={{ opacity: 0, scale: 1.05 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1.5, ease: 'easeInOut' }}
+                className="absolute inset-0"
+              >
+                <img
+                  src={slide.url}
+                  alt={slide.location}
+                  className="h-full w-full object-cover"
+                />
+              </motion.div>
+            ) : null
+          )}
+        </AnimatePresence>
+      </motion.div>
+
+      {/* ── Gradient Overlays ── */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/80" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent" />
+
+      {/* ── Noise Texture ── */}
+      <div
+        className="absolute inset-0 opacity-[0.03] mix-blend-overlay"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+        }}
+      />
+>>>>>>> 2582896e8d6643c3f4633977940a6f21990b689f
 
       {/* ── Main Content ── */}
       <motion.div
@@ -181,7 +224,11 @@ export function HeroSection() {
         </motion.div>
 
         {/* Stats */}
+<<<<<<< HEAD
         {/* <motion.div
+=======
+        <motion.div
+>>>>>>> 2582896e8d6643c3f4633977940a6f21990b689f
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.3, duration: 0.8 }}
@@ -201,7 +248,11 @@ export function HeroSection() {
               <div className="mt-0.5 text-xs text-white/50 tracking-wide">{stat.label}</div>
             </motion.div>
           ))}
+<<<<<<< HEAD
         </motion.div> */}
+=======
+        </motion.div>
+>>>>>>> 2582896e8d6643c3f4633977940a6f21990b689f
       </motion.div>
 
       {/* ── Slide Indicators ── */}
