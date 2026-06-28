@@ -11,8 +11,11 @@ import com.adventure.exception.BadRequestException;
 import com.adventure.exception.ResourceNotFoundException;
 import com.adventure.repository.*;
 import com.adventure.service.interfaces.AdminService;
+import com.cloudinary.Cloudinary;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.DialectOverride;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,14 +26,18 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
 public class AdminServiceImpl implements AdminService {
+    @Value("${cloudinary.folder}")
+    private String CLOUD_FOLDER;
 
     private final TrekRepository trekRepository;
     private final UserRepository userRepository;
@@ -39,6 +46,7 @@ public class AdminServiceImpl implements AdminService {
     private final ReviewRepository reviewRepository;
     private final CouponRepository couponRepository;
     private final GuideRepository guideRepository;
+    private final Cloudinary cloudinary;
 
     // ── Analytics ────────────────────────────────────────────────────────────
 
@@ -466,5 +474,98 @@ public class AdminServiceImpl implements AdminService {
             return new String[0];
         }
         return values.toArray(String[]::new);
+    }
+
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<CloudinaryFileResponse> getAllFiles() {
+        List<CloudinaryFileResponse> files = new ArrayList<>();
+        try {
+            Map<String, Object> result = cloudinary.search()
+                    .expression("asset_folder=" + CLOUD_FOLDER)
+                    .maxResults(500)
+                    .execute();
+
+            System.out.println(result);
+
+
+            List<Map<String, Object>> resources =
+                    (List<Map<String, Object>>) result.get("resources");
+
+            System.out.println(resources);
+
+            for (Map<String, Object> resource : resources) {
+
+                files.add(
+                        CloudinaryFileResponse.builder()
+                                .assetId((String) resource.get("asset_id"))
+                                .publicId((String) resource.get("public_id"))
+                                .url((String) resource.get("url"))
+                                .secureUrl((String) resource.get("secure_url"))
+                                .format((String) resource.get("format"))
+                                .resourceType((String) resource.get("resource_type"))
+                                .folder((String) resource.get("asset_folder"))
+                                .bytes(((Number) resource.get("bytes")).longValue())
+                                .width(resource.get("width") == null ? null :
+                                        ((Number) resource.get("width")).intValue())
+                                .height(resource.get("height") == null ? null :
+                                        ((Number) resource.get("height")).intValue())
+                                .createdAt((String) resource.get("created_at"))
+                                .build()
+                );
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return files;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<CloudinaryFileResponse> getAllFiles(String folderName) {
+        if(folderName == null) throw new BadRequestException("Invalid Folder Name : " +folderName);
+
+        List<CloudinaryFileResponse> files = new ArrayList<>();
+        try {
+            Map<String, Object> result = cloudinary.search()
+                    .expression("asset_folder=" + CLOUD_FOLDER + "/" + folderName)
+                    .maxResults(500)
+                    .execute();
+
+            System.out.println(result);
+
+
+            List<Map<String, Object>> resources =
+                    (List<Map<String, Object>>) result.get("resources");
+
+            System.out.println(resources);
+
+            for (Map<String, Object> resource : resources) {
+
+                files.add(
+                        CloudinaryFileResponse.builder()
+                                .assetId((String) resource.get("asset_id"))
+                                .publicId((String) resource.get("public_id"))
+                                .url((String) resource.get("url"))
+                                .secureUrl((String) resource.get("secure_url"))
+                                .format((String) resource.get("format"))
+                                .resourceType((String) resource.get("resource_type"))
+                                .folder((String) resource.get("asset_folder"))
+                                .bytes(((Number) resource.get("bytes")).longValue())
+                                .width(resource.get("width") == null ? null :
+                                        ((Number) resource.get("width")).intValue())
+                                .height(resource.get("height") == null ? null :
+                                        ((Number) resource.get("height")).intValue())
+                                .createdAt((String) resource.get("created_at"))
+                                .build()
+                );
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return files;
     }
 }

@@ -6,6 +6,8 @@ import com.adventure.dto.response.*;
 import com.adventure.enums.BookingStatus;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface AdminService {
     // Analytics
     AdminStatsResponse getStats();
@@ -38,4 +40,6 @@ public interface AdminService {
     // Guide management
     PagedResponse<AdminGuideResponse> getAllGuides(Pageable pageable);
     AdminGuideResponse verifyGuide(Long guideId);
+    List<CloudinaryFileResponse> getAllFiles();
+    List<CloudinaryFileResponse> getAllFiles(String folderName);
 }

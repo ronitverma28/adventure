@@ -8,6 +8,7 @@ import com.adventure.service.interfaces.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -18,15 +19,32 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
 @Tag(name = "Admin", description = "Admin management endpoints")
 @SecurityRequirement(name = "bearerAuth")
-@PreAuthorize("hasRole('ADMIN')")
+
 public class AdminController {
 
     private final AdminService adminService;
+//    @GetMapping("/files/{folder_name}")
+//    @GetMapping("/files")
+
+
+    @GetMapping("/files")
+    @Operation(summary = "Get Files from Cloudinary")
+    public ResponseEntity<ApiResponse<List<CloudinaryFileResponse>>> getFiles() {
+        return ResponseEntity.ok(ApiResponse.success(adminService.getAllFiles()));
+    }
+
+    @GetMapping("/files/{folderName}")
+    @Operation(summary = "Get Files from Cloudinary from subfolder")
+    public ResponseEntity<ApiResponse<List<CloudinaryFileResponse>>> getFiles(@PathVariable String folderName) {
+        return ResponseEntity.ok(ApiResponse.success(adminService.getAllFiles(folderName)));
+    }
 
     // ── Analytics ─────────────────────────────────────────────────────────────
 
