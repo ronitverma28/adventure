@@ -97,12 +97,12 @@ export function HeroSearchBar() {
   ];
 
   return (
-    <div className="relative">
+    <div className="relative z-50">
       {/* ── Search Container ── */}
       <motion.div
         animate={shake ? { x: [-8, 8, -6, 6, -4, 4, 0] } : { x: 0 }}
         transition={{ duration: 0.5 }}
-        className="relative overflow-visible rounded-2xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-xl"
+        className="relative z-50 overflow-visible rounded-2xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-xl"
       >
         <div className="flex flex-col md:flex-row">
           {FIELDS.map((field, idx) => {
