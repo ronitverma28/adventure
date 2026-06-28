@@ -172,7 +172,7 @@ export function HeroSearchBar() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 8, scale: 0.97 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute left-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-xl border border-white/10 bg-mountain-900/95 shadow-2xl backdrop-blur-xl"
+                      className="absolute left-0 top-full z-50 mt-2 min-w-full sm:w-64 overflow-hidden rounded-xl border border-white/10 bg-mountain-900/95 shadow-2xl backdrop-blur-xl"
                     >
                       {/* Destination */}
                       {field.key === 'destination' && (

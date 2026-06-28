@@ -61,7 +61,7 @@ export function GallerySection() {
   const isInView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
-    <section className="bg-mountain-900 py-28">
+    <section className="bg-mountain-900 py-16 md:py-28">
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -73,7 +73,7 @@ export function GallerySection() {
           <span className="mb-3 inline-block text-xs font-semibold uppercase tracking-widest text-brand-400">
             Visual Journey
           </span>
-          <h2 className="font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">
+          <h2 className="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
             Through the Lens
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-mountain-300">
@@ -84,8 +84,8 @@ export function GallerySection() {
         {/* Masonry Grid */}
         <div
           ref={ref}
-          className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
-          style={{ gridAutoRows: '200px' }}
+          className="grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-3 lg:grid-cols-4"
+          style={{ gridAutoRows: 'clamp(120px, 20vw, 200px)' }}
         >
           {GALLERY.map((item, i) => (
             <motion.div

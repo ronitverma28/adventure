@@ -49,7 +49,7 @@ export function FeaturedTreks() {
   }, []);
 
   return (
-    <section className="bg-background py-24">
+    <section className="bg-background py-16 md:py-24">
       <div className="container">
         <div className="mb-14 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
           <motion.div
@@ -61,7 +61,7 @@ export function FeaturedTreks() {
             <span className="mb-3 inline-block text-xs font-semibold uppercase tracking-widest text-brand-500">
               Handpicked for You
             </span>
-            <h2 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+            <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
               Featured Treks
             </h2>
             <p className="mt-3 max-w-lg text-muted-foreground">

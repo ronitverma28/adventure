@@ -55,7 +55,7 @@ export function PopularDestinations() {
   const [hovered, setHovered] = useState<string | null>(null);
 
   return (
-    <section className="bg-muted/30 py-28">
+    <section className="bg-muted/30 py-16 md:py-28">
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -68,7 +68,7 @@ export function PopularDestinations() {
             <span className="mb-3 inline-block text-xs font-semibold uppercase tracking-widest text-brand-500">
               Explore India
             </span>
-            <h2 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+            <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
               Popular Destinations
             </h2>
             <p className="mt-3 max-w-lg text-muted-foreground">
@@ -97,10 +97,10 @@ export function PopularDestinations() {
               onHoverEnd={() => setHovered(null)}
               className={`group relative overflow-hidden rounded-2xl ${
                 dest.size === 'large'
-                  ? 'col-span-2 row-span-2 h-80 lg:h-auto lg:min-h-[400px]'
+                  ? 'col-span-2 row-span-2 h-64 sm:h-80 lg:min-h-[400px]'
                   : dest.size === 'medium'
-                  ? 'h-52'
-                  : 'h-44'
+                  ? 'h-36 sm:h-48 md:h-52'
+                  : 'h-32 sm:h-40 md:h-44'
               }`}
             >
               {/* Image */}
@@ -114,7 +114,7 @@ export function PopularDestinations() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
               {/* Content */}
-              <div className="absolute bottom-0 left-0 right-0 p-5">
+              <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5">
                 <div className="flex items-end justify-between">
                   <div>
                     <h3 className="font-display text-xl font-bold text-white">{dest.name}</h3>

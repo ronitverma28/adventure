@@ -56,7 +56,7 @@ export function HowItWorks() {
   const isInView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
-    <section className="bg-background py-28">
+    <section className="bg-background py-16 md:py-28">
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -68,7 +68,7 @@ export function HowItWorks() {
           <span className="mb-3 inline-block text-xs font-semibold uppercase tracking-widest text-brand-500">
             Simple Process
           </span>
-          <h2 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+          <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
             How Your Journey Works
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-muted-foreground">

@@ -87,7 +87,7 @@ export function WhyChooseUs() {
   const isInView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
-    <section className="relative overflow-hidden bg-mountain-900 py-28">
+    <section className="relative overflow-hidden bg-mountain-900 py-16 md:py-28">
       {/* Background decoration */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-brand-500/10 via-transparent to-transparent" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-blue-500/5 via-transparent to-transparent" />
@@ -104,7 +104,7 @@ export function WhyChooseUs() {
           <span className="mb-3 inline-block text-xs font-semibold uppercase tracking-widest text-brand-400">
             Why Adventure?
           </span>
-          <h2 className="font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">
+          <h2 className="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
             The Adventure Difference
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-mountain-300">
@@ -114,7 +114,7 @@ export function WhyChooseUs() {
         </motion.div>
 
         {/* Grid */}
-        <div ref={ref} className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div ref={ref} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {FEATURES.map((feature, i) => {
             const Icon = feature.icon;
             return (

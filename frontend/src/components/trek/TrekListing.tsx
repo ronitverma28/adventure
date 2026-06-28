@@ -160,7 +160,7 @@ export function TrekListing({ initialTreks = [] }: TrekListingProps) {
 
   return (
     <>
-      <div className="flex gap-6">
+      <div className="flex gap-4 lg:gap-6">
         <TrekFilterPanel
           filters={filters}
           onChange={setFilters}
@@ -169,14 +169,15 @@ export function TrekListing({ initialTreks = [] }: TrekListingProps) {
 
         <div className="min-w-0 flex-1">
           <div className="mb-6 flex flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="relative flex-1">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              {/* Filter button inline on mobile (rendered by TrekFilterPanel as lg:hidden child) */}
+              <div className="relative min-w-0 flex-1">
                 <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type="text"
                   value={searchInput}
                   onChange={(event) => setSearchInput(event.target.value)}
-                  placeholder="Search treks, destinations..."
+                  placeholder="Search treks..."
                   className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-4 text-sm text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-brand-500 focus:ring-1 focus:ring-brand-500/20"
                 />
                 {searchInput && (
