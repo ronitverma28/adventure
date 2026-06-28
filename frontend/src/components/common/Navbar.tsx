@@ -158,7 +158,7 @@ export function Navbar() {
                   <a
                     href="/login"
                     className={cn(
-                      'hidden rounded-lg px-4 py-2 text-sm font-medium transition-colors sm:block',
+                      'rounded-xl bg-brand-500 px-4 py-3 text-center text-sm font-semibold text-white shadow-lg shadow-brand-500/30 transition-colors hover:bg-brand-600',
                       navTextColor
                     )}
                   >
