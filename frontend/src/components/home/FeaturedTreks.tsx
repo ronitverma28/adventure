@@ -29,16 +29,27 @@ export function FeaturedTreks() {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
   const [treks, setTreks] = useState<Trek[]>([]);
+  const [usingMockData, setUsingMockData] = useState(false);
 
   useEffect(() => {
     let active = true;
 
     async function loadTreks() {
       try {
-        const response = await trekApi.getFeatured(0, 6);
-        if (active) setTreks(response.data.data.content);
+        const response = await trekApi.getFeatured(0, 4);
+        if (active) {
+          setTreks(response.data.data.content.slice(0, 4));
+          setUsingMockData(false);
+        }
       } catch {
-        if (active) setTreks([]);
+        if (!active) return;
+        // Fallback: pick 4 featured/bestseller mock treks
+        const { MOCK_TREKS } = await import('@/lib/data/mock-treks');
+        const featured = MOCK_TREKS
+          .filter((t) => t.isFeatured || t.isBestseller)
+          .slice(0, 4);
+        setTreks(featured);
+        setUsingMockData(true);
       }
     }
 
@@ -65,8 +76,14 @@ export function FeaturedTreks() {
               Featured Treks
             </h2>
             <p className="mt-3 max-w-lg text-muted-foreground">
-              Live featured treks pulled from the backend inventory.
+              Expertly curated treks across India's most breathtaking Himalayan regions.
             </p>
+            {usingMockData && (
+              <span className="mt-2 inline-flex items-center gap-1.5 text-[11px] text-amber-500/80">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                Showing demo treks — API offline
+              </span>
+            )}
           </motion.div>
 
           <motion.a
@@ -87,7 +104,7 @@ export function FeaturedTreks() {
           variants={containerVariants}
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
-          className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4"
         >
           {treks.map((trek) => (
             <TrekCard key={trek.id} trek={trek} />
