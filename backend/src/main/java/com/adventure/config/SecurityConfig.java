@@ -60,6 +60,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_URLS).permitAll()
                         .requestMatchers(HttpMethod.GET, "/treks/**").permitAll()
+                        .requestMatchers("/admin/files/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/guides/manage/**").hasAnyRole("ADMIN", "GUIDE")
                         .anyRequest().authenticated()
