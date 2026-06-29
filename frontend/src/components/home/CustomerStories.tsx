@@ -199,7 +199,7 @@ export function CustomerStories() {
             </AnimatePresence>
 
             {/* Mini story cards */}
-            <div className="mt-4 grid grid-cols-2 gap-3">
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
               {STORIES.filter((_, i) => i !== active)
                 .slice(0, 2)
                 .map((s) => (

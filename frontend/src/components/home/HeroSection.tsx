@@ -57,7 +57,7 @@ export function HeroSection() {
   return (
     <section
       ref={containerRef}
-      className="relative h-screen min-h-[700px] bg-mountain-900"
+      className="relative h-screen min-h-[820px] sm:min-h-[750px] md:min-h-[700px] bg-mountain-900"
     >
       {/* ── Background layers wrapped in overflow-hidden so parallax stays clipped ── */}
       <div className="absolute inset-0 overflow-hidden">
@@ -240,7 +240,7 @@ export function HeroSection() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2, duration: 1 }}
-        className="absolute bottom-8 left-1/2 z-20 -translate-x-1/2"
+        className="absolute bottom-8 left-1/2 z-20 -translate-x-1/2 hidden md:block"
       >
         <motion.div
           animate={{ y: [0, 8, 0] }}

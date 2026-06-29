@@ -47,7 +47,7 @@ export function CommunitySection() {
             </p>
 
             {/* Stats */}
-            <div className="mt-8 grid grid-cols-3 gap-6">
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
               {COMMUNITY_STATS.map((stat) => {
                 const Icon = stat.icon;
                 return (
@@ -67,10 +67,10 @@ export function CommunitySection() {
             </div>
 
             {/* CTAs */}
-            <div className="mt-10 flex flex-wrap gap-4">
+            <div className="mt-10 flex flex-col sm:flex-row gap-4">
               <a
                 href="/register"
-                className="flex items-center gap-2 rounded-full bg-brand-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-500/30 transition-all hover:bg-brand-600 hover:-translate-y-0.5"
+                className="flex items-center justify-center gap-2 rounded-full bg-brand-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-500/30 transition-all hover:bg-brand-600 hover:-translate-y-0.5 w-full sm:w-auto"
               >
                 Join the Community
                 <ArrowRight className="h-4 w-4" />
@@ -79,7 +79,7 @@ export function CommunitySection() {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-semibold text-foreground transition-all hover:bg-muted"
+                className="flex items-center justify-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-semibold text-foreground transition-all hover:bg-muted w-full sm:w-auto"
               >
                 <Instagram className="h-4 w-4" />
                 Follow on Instagram

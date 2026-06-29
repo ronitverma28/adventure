@@ -85,7 +85,7 @@ export function PopularDestinations() {
         </motion.div>
 
         {/* Bento Grid */}
-        <div ref={ref} className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+        <div ref={ref} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {DESTINATIONS.map((dest, i) => (
             <motion.a
               key={dest.name}
@@ -97,7 +97,7 @@ export function PopularDestinations() {
               onHoverEnd={() => setHovered(null)}
               className={`group relative overflow-hidden rounded-2xl ${
                 dest.size === 'large'
-                  ? 'col-span-2 row-span-2 h-64 sm:h-80 lg:min-h-[400px]'
+                  ? 'col-span-1 sm:col-span-2 sm:row-span-2 h-64 sm:h-80 lg:min-h-[400px]'
                   : dest.size === 'medium'
                   ? 'h-36 sm:h-48 md:h-52'
                   : 'h-32 sm:h-40 md:h-44'
