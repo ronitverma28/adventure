@@ -298,7 +298,7 @@ export default function DashboardPage() {
   const passwordForm = useForm<ChangePasswordData>({ resolver: zodResolver(changePasswordSchema) });
   const passwordMutation = useMutation({
     mutationFn: (d: ChangePasswordData) =>
-      authApi.changePassword(d.currentPassword, d.newPassword, d.confirmPassword),
+      authApi.changePassword(d),
     onSuccess: () => { toast.success('Password changed!'); passwordForm.reset(); },
     onError: (err: any) => toast.error(err?.response?.data?.error ?? 'Failed to change password'),
   });

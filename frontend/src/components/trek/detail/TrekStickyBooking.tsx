@@ -143,7 +143,7 @@ export function TrekStickyBooking({ trek }: { trek: Trek }) {
             </button>
             <span className="flex-1 text-center font-semibold text-foreground">{persons}</span>
             <button
-              onClick={() => setPersons((p) => Math.min(trek.groupSizeMax, p + 1))}
+              onClick={() => setPersons((p) => Math.min(trek.groupSizeMax ?? 100, p + 1))}
               className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted text-foreground transition-colors hover:bg-muted-foreground/20"
             >
               +

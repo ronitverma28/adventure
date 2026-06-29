@@ -16,7 +16,7 @@ export default function ForgotPasswordPage() {
   const [sentEmail, setSentEmail] = useState('');
   const { register, handleSubmit, formState: { errors } } = useForm<ForgotPasswordData>({ resolver: zodResolver(forgotPasswordSchema) });
   const mutation = useMutation({
-    mutationFn: (d: ForgotPasswordData) => authApi.forgotPassword(d.email),
+    mutationFn: (d: ForgotPasswordData) => authApi.forgotPassword(d),
     onSuccess: (_, v) => { setSentEmail(v.email); setSent(true); },
     onError: () => toast.error('Something went wrong. Please try again.'),
   });

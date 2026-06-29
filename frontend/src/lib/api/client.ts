@@ -1,6 +1,6 @@
 import type { ApiResponse } from '@/types/api.types';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 const AUTH_STORAGE_KEY = 'adventure-auth';
 
 type QueryValue = string | number | boolean | null | undefined;
@@ -56,6 +56,7 @@ function setStoredTokens(accessToken: string, refreshToken?: string | null) {
       isAuthenticated: true,
     };
     window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(parsed));
+    document.cookie = `adventure-token=${accessToken}; path=/; max-age=604800; SameSite=Lax`;
   } catch {
     // Ignore storage write failures; the current request can still continue.
   }
@@ -64,6 +65,7 @@ function setStoredTokens(accessToken: string, refreshToken?: string | null) {
 function clearStoredAuth() {
   if (typeof window === 'undefined') return;
   window.localStorage.removeItem(AUTH_STORAGE_KEY);
+  document.cookie = `adventure-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
 }
 
 function buildUrl(path: string, params?: QueryParams) {

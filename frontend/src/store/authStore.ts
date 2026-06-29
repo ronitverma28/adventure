@@ -22,19 +22,31 @@ export const useAuthStore = create<AuthState>()(
       refreshToken: null,
       isAuthenticated: false,
 
-      setAuth: (user, accessToken, refreshToken) =>
-        set({ user, accessToken, refreshToken, isAuthenticated: true }),
+      setAuth: (user, accessToken, refreshToken) => {
+        if (typeof window !== 'undefined') {
+          document.cookie = `adventure-token=${accessToken}; path=/; max-age=604800; SameSite=Lax`;
+        }
+        set({ user, accessToken, refreshToken, isAuthenticated: true });
+      },
 
-      setTokens: (accessToken, refreshToken) =>
-        set({ accessToken, refreshToken }),
+      setTokens: (accessToken, refreshToken) => {
+        if (typeof window !== 'undefined') {
+          document.cookie = `adventure-token=${accessToken}; path=/; max-age=604800; SameSite=Lax`;
+        }
+        set({ accessToken, refreshToken });
+      },
 
       updateUser: (updates) =>
         set((state) => ({
           user: state.user ? { ...state.user, ...updates } : null,
         })),
 
-      logout: () =>
-        set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false }),
+      logout: () => {
+        if (typeof window !== 'undefined') {
+          document.cookie = `adventure-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+        }
+        set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false });
+      },
     }),
     {
       name: 'adventure-auth',

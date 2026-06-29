@@ -113,7 +113,7 @@ export function TrekHeroBanner({ trek, extra, isWishlisted, onWishlist }: Props)
               <span className="text-white/50">({trek.totalReviews.toLocaleString()} reviews)</span>
             </span>
             <span className="flex items-center gap-1.5">
-              <Users className="h-4 w-4" />{trek.totalBookings.toLocaleString()} trekkers
+              <Users className="h-4 w-4" />{(trek.totalBookings ?? 0).toLocaleString()} trekkers
             </span>
           </div>
 

@@ -27,7 +27,11 @@ function ResetPasswordContent() {
   const token = useSearchParams().get('token') ?? '';
   const { register, handleSubmit, formState: { errors } } = useForm<ResetPasswordData>({ resolver: zodResolver(resetPasswordSchema) });
   const mutation = useMutation({
-    mutationFn: (d: ResetPasswordData) => authApi.resetPassword(token, d.newPassword, d.confirmPassword),
+    mutationFn: (d: ResetPasswordData) => authApi.resetPassword({
+      token,
+      newPassword: d.newPassword,
+      confirmPassword: d.confirmPassword
+    }),
     onSuccess: () => setDone(true),
     onError: () => toast.error('Invalid or expired reset link. Please request a new one.'),
   });
