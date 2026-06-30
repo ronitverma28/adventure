@@ -18,7 +18,13 @@ export function useAuth() {
         auth.accessToken, auth.refreshToken
       );
       toast.success(`Welcome back, ${auth.name}!`);
-      router.push('/');
+      
+      let redirectUrl = '/';
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        redirectUrl = params.get('redirect') || '/';
+      }
+      router.push(redirectUrl);
     },
     onError: (err: any) => {
       toast.error(err?.response?.data?.error ?? 'Invalid email or password');
@@ -44,7 +50,7 @@ export function useAuth() {
   const logout = async () => {
     try { await authApi.logout(); } finally {
       storeLogout();
-      router.push('/');
+      router.push('/login');
       toast.success('Logged out successfully');
     }
   };

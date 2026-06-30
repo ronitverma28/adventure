@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Mountain, Heart, User, ChevronDown, Search } from 'lucide-react';
-import { useAuthStore } from '@/store/authStore';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { useUIStore } from '@/store/uiStore';
 import { cn } from '@/lib/utils/cn';
 import { mainNavLinks } from '@/config/navigation.config';
@@ -13,7 +13,7 @@ export function Navbar() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user, logout } = useAuth();
   const { isMobileMenuOpen, toggleMobileMenu } = useUIStore();
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export function Navbar() {
         className={cn(
           'fixed left-0 right-0 top-0 z-50 transition-all duration-500',
           hasSolidNavbar
-            ? 'border-b border-black/10 bg-transparent backdrop-blur-md'
+            ? 'border-b border-white/10 bg-mountain-900/95 backdrop-blur-md shadow-lg'
             : 'bg-transparent'
         )}
       >
@@ -144,7 +144,13 @@ export function Navbar() {
                             </a>
                           ))}
                           <div className="border-t border-white/10">
-                            <button className="block w-full px-4 py-2.5 text-left text-sm text-red-400 transition-colors hover:bg-white/10 hover:text-red-300">
+                            <button
+                              onClick={() => {
+                                logout();
+                                setUserMenuOpen(false);
+                              }}
+                              className="block w-full px-4 py-2.5 text-left text-sm text-red-400 transition-colors hover:bg-white/10 hover:text-red-300"
+                            >
                               Sign Out
                             </button>
                           </div>
@@ -233,7 +239,13 @@ export function Navbar() {
                     <a href="/profile" className="rounded-xl px-4 py-3 text-sm font-medium text-white/80 hover:bg-white/10 hover:text-white transition-colors">
                       Profile
                     </a>
-                    <button className="rounded-xl px-4 py-3 text-left text-sm font-medium text-red-400 hover:bg-white/10 transition-colors">
+                    <button
+                      onClick={() => {
+                        logout();
+                        toggleMobileMenu();
+                      }}
+                      className="rounded-xl px-4 py-3 text-left text-sm font-medium text-red-400 hover:bg-white/10 transition-colors"
+                    >
                       Sign Out
                     </button>
                   </>
