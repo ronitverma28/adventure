@@ -280,15 +280,37 @@ export default function DashboardPage() {
   const profileForm = useForm<UpdateProfileFormData>({
     resolver: zodResolver(updateProfileSchema),
     defaultValues: {
-      name:    user?.name ?? '',
-      phone:   user?.phone ?? '',
-      city:    (user as any)?.city ?? '',
-      state:   (user as any)?.state ?? '',
-      country: (user as any)?.country ?? 'India',
+      name:        user?.name ?? '',
+      phone:       user?.phone ?? '',
+      gender:      (user as any)?.gender ?? '',
+      dateOfBirth: (user as any)?.dateOfBirth ?? '',
+      address:     (user as any)?.address ?? '',
+      city:        (user as any)?.city ?? '',
+      state:       (user as any)?.state ?? '',
+      country:     (user as any)?.country ?? 'India',
     },
   });
+
+  useEffect(() => {
+    if (user) {
+      profileForm.reset({
+        name:        user.name ?? '',
+        phone:       user.phone ?? '',
+        gender:      (user as any).gender ?? '',
+        dateOfBirth: (user as any).dateOfBirth ?? '',
+        address:     (user as any).address ?? '',
+        city:        (user as any).city ?? '',
+        state:       (user as any).state ?? '',
+        country:     (user as any).country ?? 'India',
+      });
+      if (user.avatarUrl) {
+        setAvatarPreview(user.avatarUrl);
+      }
+    }
+  }, [user, profileForm]);
+
   const profileMutation = useMutation({
-    mutationFn: (data: UpdateProfileFormData) => authApi.updateProfile(data),
+    mutationFn: (data: UpdateProfileFormData & { avatarUrl?: string }) => authApi.updateProfile(data),
     onSuccess: ({ data }) => { updateUser(data.data as any); toast.success('Profile updated!'); },
     onError: () => toast.error('Failed to update profile'),
   });
@@ -430,7 +452,17 @@ export default function DashboardPage() {
                 {activeTab === 'profile' && (
                   <div className="rounded-2xl border border-border bg-card p-6">
                     <h2 className="mb-6 font-display text-xl font-bold text-foreground">Personal Information</h2>
-                    <form onSubmit={profileForm.handleSubmit((d) => profileMutation.mutate(d))} className="space-y-5">
+                    <form onSubmit={profileForm.handleSubmit((d) => profileMutation.mutate({
+                      ...d,
+                      avatarUrl: avatarPreview || undefined,
+                      phone: d.phone || undefined,
+                      gender: d.gender || undefined,
+                      dateOfBirth: d.dateOfBirth || undefined,
+                      address: d.address || undefined,
+                      city: d.city || undefined,
+                      state: d.state || undefined,
+                      country: d.country || undefined,
+                    }))} className="space-y-5">
                       <div className="grid gap-5 sm:grid-cols-2">
                         <div className="sm:col-span-2">
                           <label className="mb-1.5 block text-sm font-medium text-foreground">Full Name</label>
