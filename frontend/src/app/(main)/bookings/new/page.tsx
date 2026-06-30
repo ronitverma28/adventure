@@ -360,7 +360,7 @@ function NewBookingContent() {
   };
 
   return (
-    <section className="bg-background py-8 sm:py-10">
+    <section className="bg-background pt-24 pb-8 sm:pt-28 sm:pb-10">
       <div className="mx-auto max-w-7xl px-4">
         <Link href={selectedTrek ? `/treks/${selectedTrek.slug}` : '/treks'} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> Back to treks

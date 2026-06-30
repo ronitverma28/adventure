@@ -155,7 +155,7 @@ export default function PlannerPage() {
   }
 
   return (
-    <section className="min-h-screen bg-background">
+    <section className="min-h-screen bg-background pt-16">
       {/* Hero */}
       <div className="bg-gradient-to-br from-brand-500/10 via-background to-emerald-500/10 py-12">
         <div className="mx-auto max-w-3xl px-4 text-center">
@@ -436,7 +436,7 @@ function ResultsView({
   const [activeTab, setActiveTab] = useState<'reasons' | 'prep' | 'packing'>('reasons');
 
   return (
-    <section className="min-h-screen bg-background py-8">
+    <section className="min-h-screen bg-background pt-24 pb-8">
       <div className="mx-auto max-w-7xl px-4">
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

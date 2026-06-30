@@ -51,7 +51,7 @@ export default function BookingConfirmationPage() {
   }
 
   return (
-    <section className="bg-background py-10">
+    <section className="bg-background pt-24 pb-10">
       <div className="mx-auto max-w-4xl px-4">
         <div className="rounded-2xl border border-border bg-card p-6 shadow-xl sm:p-8">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
