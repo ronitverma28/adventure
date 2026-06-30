@@ -42,8 +42,7 @@ const STEPS = [
   { id: 3, label: 'Travelers', icon: Users },
   { id: 4, label: 'Details', icon: UserRound },
   { id: 5, label: 'Coupon', icon: Ticket },
-  { id: 6, label: 'Payment', icon: CreditCard },
-  { id: 7, label: 'Confirmation', icon: CheckCircle2 },
+  { id: 6, label: 'Confirmation', icon: CheckCircle2 },
 ] as const;
 
 const defaultTraveler = (index: number): Traveler => ({
@@ -227,7 +226,7 @@ function NewBookingContent() {
       toast.error(error);
       return;
     }
-    setStep((current) => Math.min(current + 1, 7));
+    setStep((current) => Math.min(current + 1, 6));
   };
 
   const goBack = () => {
@@ -249,40 +248,6 @@ function NewBookingContent() {
     } catch (error: any) {
       toast.error(error?.response?.data?.error ?? 'Could not validate coupon');
     }
-  };
-
-  const processPayment = async (orderId: string, amount: number, keyId: string): Promise<PaymentResult> => {
-    if (orderId.startsWith('order_dev_') || !window.Razorpay) {
-      return {
-        razorpayOrderId: orderId,
-        razorpayPaymentId: `pay_dev_${Date.now()}`,
-        razorpaySignature: 'dev-signature',
-      };
-    }
-
-    return new Promise((resolve, reject) => {
-      const Razorpay = window.Razorpay;
-      if (!Razorpay) {
-        reject(new Error('Payment gateway unavailable'));
-        return;
-      }
-      const checkout = new Razorpay({
-        key: keyId,
-        amount,
-        currency: 'INR',
-        name: 'Adventure Platform',
-        description: selectedTrek?.title,
-        order_id: orderId,
-        prefill: { name: user?.name, email: user?.email },
-        handler: (response: any) => resolve({
-          razorpayOrderId: response.razorpay_order_id,
-          razorpayPaymentId: response.razorpay_payment_id,
-          razorpaySignature: response.razorpay_signature,
-        }),
-        modal: { ondismiss: () => reject(new Error('Payment cancelled')) },
-      });
-      checkout.open();
-    });
   };
 
   const submitBooking = async () => {
@@ -319,7 +284,13 @@ function NewBookingContent() {
         couponCode: couponCode || undefined,
       });
       const order = orderResponse.data.data;
-      const payment = await processPayment(order.orderId, order.amount, order.keyId);
+      
+      const payment = {
+        razorpayOrderId: order.orderId,
+        razorpayPaymentId: 'pay_offline',
+        razorpaySignature: 'offline_signature',
+      };
+
       const confirmationResponse = await bookingApi.confirmBooking({
         ...payment,
         trekId: selectedTrek.id,
@@ -335,10 +306,10 @@ function NewBookingContent() {
 
       setConfirmation(confirmationResponse.data.data);
       reset();
-      toast.success('Booking confirmed');
-      setStep(7);
+      toast.success('Booking requested successfully');
+      setStep(6);
     } catch (error: any) {
-      toast.error(error?.message === 'Payment cancelled' ? 'Payment cancelled' : error?.response?.data?.error ?? 'Booking failed');
+      toast.error(error?.response?.data?.error ?? 'Booking failed');
     } finally {
       setProcessing(false);
     }
@@ -425,26 +396,14 @@ function NewBookingContent() {
                 />
               )}
 
-              {step === 6 && selectedTrek && selectedBatch && (
-                <PaymentStep
-                  trek={selectedTrek}
-                  batch={selectedBatch}
-                  pricing={pricing}
-                  travelers={travelers}
-                  contact={contact}
-                  isProcessing={isProcessing}
-                  onPay={submitBooking}
-                />
-              )}
-
-              {step === 7 && (
+              {step === 6 && (
                 <ConfirmationStep
                   confirmation={confirmation}
                   onDownload={downloadDocument}
                 />
               )}
 
-              {step < 6 && (
+              {step < 5 && (
                 <div className="mt-6 flex flex-col-reverse gap-3 border-t border-border pt-5 sm:flex-row sm:justify-between">
                   <button
                     onClick={goBack}
@@ -462,14 +421,28 @@ function NewBookingContent() {
                 </div>
               )}
 
-              {step === 6 && (
-                <div className="mt-6 flex border-t border-border pt-5">
+              {step === 5 && (
+                <div className="mt-6 flex flex-col-reverse gap-3 border-t border-border pt-5 sm:flex-row sm:justify-between">
                   <button
                     onClick={goBack}
                     disabled={isProcessing}
                     className="rounded-xl border border-border px-5 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Back
+                  </button>
+                  <button
+                    onClick={submitBooking}
+                    disabled={isProcessing}
+                    className="flex items-center justify-center rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-500/25 transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      'Request Booking'
+                    )}
                   </button>
                 </div>
               )}
@@ -492,7 +465,7 @@ function NewBookingContent() {
 function StepProgress({ currentStep }: { currentStep: number }) {
   return (
     <div className="overflow-x-auto rounded-2xl border border-border bg-card p-3">
-      <div className="grid min-w-[760px] grid-cols-7 gap-2">
+      <div className="grid min-w-[760px] grid-cols-6 gap-2">
         {STEPS.map(({ id, label, icon: Icon }) => {
           const active = currentStep === id;
           const done = currentStep > id;
@@ -764,59 +737,6 @@ function CouponStep({
   );
 }
 
-function PaymentStep({
-  trek,
-  batch,
-  pricing,
-  travelers,
-  contact,
-  isProcessing,
-  onPay,
-}: {
-  trek: Trek;
-  batch: TrekBatchDate;
-  pricing: { subtotal: number; couponDiscount: number; taxAmount: number; total: number };
-  travelers: Traveler[];
-  contact: ContactDetails;
-  isProcessing: boolean;
-  onPay: () => void;
-}) {
-  return (
-    <div>
-      <StepHeader title="Step 6: Payment" description="Review your booking and complete payment securely." />
-      <div className="mt-5 grid gap-5 lg:grid-cols-2">
-        <div className="rounded-xl border border-border bg-background p-4">
-          <h3 className="font-display text-lg font-bold text-foreground">{trek.title}</h3>
-          <div className="mt-3 space-y-2 text-sm text-muted-foreground">
-            <div>{formatDate(batch.startDate, 'dd MMM')} - {formatDate(batch.endDate, 'dd MMM yyyy')}</div>
-            <div>{travelers.length} travelers</div>
-            <div>Emergency: {contact.emergencyContact} ({contact.emergencyPhone})</div>
-          </div>
-        </div>
-        <div className="rounded-xl border border-border bg-background p-4">
-          <h3 className="font-display text-lg font-bold text-foreground">Payment Summary</h3>
-          <div className="mt-3 space-y-2 text-sm">
-            <SummaryRow label="Subtotal" value={formatCurrency(pricing.subtotal)} />
-            <SummaryRow label="Coupon discount" value={`-${formatCurrency(pricing.couponDiscount)}`} />
-            <SummaryRow label="GST 18%" value={formatCurrency(pricing.taxAmount)} />
-            <div className="border-t border-border pt-2">
-              <SummaryRow label="Total payable" value={formatCurrency(pricing.total)} strong />
-            </div>
-          </div>
-        </div>
-      </div>
-      <button
-        onClick={onPay}
-        disabled={isProcessing}
-        className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-500 py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand-500/30 transition-all hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}
-        Pay {formatCurrency(pricing.total)}
-      </button>
-    </div>
-  );
-}
-
 function ConfirmationStep({
   confirmation,
   onDownload,
@@ -826,19 +746,37 @@ function ConfirmationStep({
 }) {
   if (!confirmation) {
     return (
-      <div className="rounded-xl border border-orange-200 bg-orange-50 p-4 text-sm text-orange-700">
+      <div className="flex flex-col items-center justify-center p-8 text-center text-sm text-amber-600">
         <AlertCircle className="mb-2 h-5 w-5" />
-        Confirmation details are not available yet. Complete payment to generate your booking.
+        Confirmation details are not available yet.
       </div>
     );
   }
 
+  const isConfirmed = confirmation.status === 'CONFIRMED';
+
   return (
     <div>
-      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-700">
-        <CheckCircle2 className="h-8 w-8" />
-        <h2 className="mt-3 font-display text-2xl font-bold">Step 7: Booking Confirmed</h2>
+      <div className={cn(
+        "rounded-xl border p-5",
+        isConfirmed 
+          ? "border-emerald-200 bg-emerald-50 text-emerald-700" 
+          : "border-amber-200 bg-amber-50 text-amber-700"
+      )}>
+        {isConfirmed ? (
+          <CheckCircle2 className="h-8 w-8 text-emerald-600" />
+        ) : (
+          <AlertCircle className="h-8 w-8 text-amber-600" />
+        )}
+        <h2 className="mt-3 font-display text-2xl font-bold">
+          {isConfirmed ? 'Booking Confirmed' : 'Booking Request Submitted'}
+        </h2>
         <p className="mt-1 text-sm">Reference: <span className="font-bold">{confirmation.bookingRef}</span></p>
+        {!isConfirmed && (
+          <p className="mt-2 text-xs text-amber-600/90">
+            Your booking request has been submitted. You will receive a confirmation email once the business approves your booking.
+          </p>
+        )}
       </div>
       <div className="mt-5 grid gap-4 sm:grid-cols-3">
         <div className="rounded-xl border border-border bg-background p-4">
@@ -850,17 +788,21 @@ function ConfirmationStep({
           <div className="mt-1 font-semibold text-foreground">{formatDate(confirmation.startDate, 'dd MMM')} - {formatDate(confirmation.endDate, 'dd MMM yyyy')}</div>
         </div>
         <div className="rounded-xl border border-border bg-background p-4">
-          <div className="text-xs text-muted-foreground">Paid</div>
-          <div className="mt-1 font-semibold text-foreground">{formatCurrency(confirmation.totalAmount)}</div>
+          <div className="text-xs text-muted-foreground">Status</div>
+          <div className="mt-1 font-semibold text-foreground capitalize">{confirmation.status.toLowerCase().replace('_', ' ')}</div>
         </div>
       </div>
       <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-        <button onClick={() => onDownload('ticket')} className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 text-sm font-semibold text-foreground hover:bg-muted">
-          <Download className="h-4 w-4" /> Ticket
-        </button>
-        <button onClick={() => onDownload('invoice')} className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 text-sm font-semibold text-foreground hover:bg-muted">
-          <FileText className="h-4 w-4" /> Invoice
-        </button>
+        {isConfirmed && (
+          <>
+            <button onClick={() => onDownload('ticket')} className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 text-sm font-semibold text-foreground hover:bg-muted">
+              <Download className="h-4 w-4" /> Ticket
+            </button>
+            <button onClick={() => onDownload('invoice')} className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 text-sm font-semibold text-foreground hover:bg-muted">
+              <FileText className="h-4 w-4" /> Invoice
+            </button>
+          </>
+        )}
         <Link href={`/bookings/${confirmation.bookingRef}`} className="inline-flex items-center justify-center rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white">
           Open confirmation page
         </Link>
