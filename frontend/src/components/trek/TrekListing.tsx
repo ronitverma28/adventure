@@ -75,8 +75,12 @@ export function TrekListing({ initialTreks = [] }: TrekListingProps) {
             }, currentPage - 1, 12);
 
         if (!active) return;
-        setResult(response.data.data);
-        setUsingMockData(false);
+        if (response.data?.data?.content && response.data.data.content.length > 0) {
+          setResult(response.data.data);
+          setUsingMockData(false);
+        } else {
+          throw new Error('No treks found in API response');
+        }
       } catch {
         if (!active) return;
         // API unavailable — fall back to mock data with client-side filtering

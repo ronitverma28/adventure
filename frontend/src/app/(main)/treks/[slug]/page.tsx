@@ -25,6 +25,49 @@ async function getTrek(slug: string): Promise<TrekDetail | null> {
       })),
     };
   } catch {
+    try {
+      const { MOCK_TREKS } = await import('@/lib/data/mock-treks');
+      const mockTrek = MOCK_TREKS.find((t) => t.slug === slug);
+      if (mockTrek) {
+        return {
+          ...mockTrek,
+          overview: mockTrek.shortDescription,
+          longDescription: mockTrek.shortDescription + " Let's explore the scenic landscapes, high mountains, and beautiful trails on this amazing adventure trek.",
+          metaTitle: `${mockTrek.title} | Adventure`,
+          metaDescription: mockTrek.shortDescription,
+          itinerary: mockTrek.itinerary || [],
+          upcomingBatches: mockTrek.upcomingBatches?.map((b) => ({
+            id: b.id,
+            startDate: b.startDate,
+            endDate: b.endDate,
+            availableSeats: b.availableSeats,
+            totalSeats: b.totalSeats,
+            price: mockTrek.pricePerPerson,
+          })) || [],
+          thingsToCarry: [
+            'Warm clothes (jacket, fleece, thermals)',
+            'Trekking shoes with good grip',
+            'Water bottle & hydration pack',
+            'Personal medical kit',
+            'Headlamp or flashlight with extra batteries',
+          ],
+          inclusions: [
+            'Professional guide and support staff',
+            'All meals during the trek (veg)',
+            'Forest permits and camping charges',
+            'High-quality camping tents and sleeping bags',
+          ],
+          exclusions: [
+            'Personal trekking gear',
+            'Insurance of any kind',
+            'Tips for guides or support staff',
+            'Anything not mentioned in inclusions',
+          ],
+        } as any;
+      }
+    } catch (e) {
+      console.error('Failed to load mock trek details:', e);
+    }
     return null;
   }
 }

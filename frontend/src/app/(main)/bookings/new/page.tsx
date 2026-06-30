@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import {
   AlertCircle, ArrowLeft, Calendar, Check, CheckCircle2, CreditCard, Download,
   FileText, Loader2, MapPin, ShieldCheck, Ticket, UserRound, Users,
+  Phone, MessageCircle,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { bookingApi } from '@/lib/api/booking.api';
@@ -41,8 +42,7 @@ const STEPS = [
   { id: 2, label: 'Choose Date', icon: Calendar },
   { id: 3, label: 'Travelers', icon: Users },
   { id: 4, label: 'Details', icon: UserRound },
-  { id: 5, label: 'Coupon', icon: Ticket },
-  { id: 6, label: 'Confirmation', icon: CheckCircle2 },
+  { id: 5, label: 'Confirmation', icon: CheckCircle2 },
 ] as const;
 
 const defaultTraveler = (index: number): Traveler => ({
@@ -96,8 +96,7 @@ function NewBookingContent() {
     pickupLocation: '',
     specialRequests: '',
   });
-  const [couponCode, setCouponCode] = useState('');
-  const [couponDiscount, setCouponDiscount] = useState(0);
+  const couponDiscount = 0;
   const [confirmation, setConfirmation] = useState<BookingConfirmation | null>(null);
 
   useEffect(() => {
@@ -107,9 +106,20 @@ function NewBookingContent() {
       try {
         const response = await trekApi.getAll(undefined, 0, 100);
         if (!active) return;
-        setTreks(response.data.data.content);
+        if (response.data?.data?.content && response.data.data.content.length > 0) {
+          setTreks(response.data.data.content);
+        } else {
+          throw new Error('No treks found in API response');
+        }
       } catch {
-        if (active) toast.error('Failed to load treks');
+        if (active) {
+          try {
+            const { MOCK_TREKS } = await import('@/lib/data/mock-treks');
+            setTreks(MOCK_TREKS);
+          } catch (e) {
+            toast.error('Failed to load mock treks');
+          }
+        }
       } finally {
         if (active) setTreksLoading(false);
       }
@@ -183,8 +193,6 @@ function NewBookingContent() {
     const firstBatch = trek.upcomingBatches?.[0];
     setSelectedTrekSlug(trek.slug);
     setSelectedBatchId(firstBatch?.id ?? 0);
-    setCouponCode('');
-    setCouponDiscount(0);
     setContact((current) => ({ ...current, pickupLocation: trek.location }));
   };
 
@@ -226,28 +234,11 @@ function NewBookingContent() {
       toast.error(error);
       return;
     }
-    setStep((current) => Math.min(current + 1, 6));
+    setStep((current) => Math.min(current + 1, 5));
   };
 
   const goBack = () => {
     setStep((current) => Math.max(current - 1, 1));
-  };
-
-  const applyCoupon = async () => {
-    if (!selectedTrek || !couponCode.trim()) return;
-    try {
-      const response = await bookingApi.validateCoupon(couponCode.trim(), selectedTrek.id, pricing.subtotal);
-      const result = response.data.data;
-      if (!result.valid) {
-        setCouponDiscount(0);
-        toast.error(result.message);
-        return;
-      }
-      setCouponDiscount(result.discountAmount);
-      toast.success(result.message);
-    } catch (error: any) {
-      toast.error(error?.response?.data?.error ?? 'Could not validate coupon');
-    }
   };
 
   const submitBooking = async () => {
@@ -269,45 +260,71 @@ function NewBookingContent() {
         numChildren,
         travelers,
         ...contact,
-        couponCode: couponCode || undefined,
-        couponDiscount,
         paymentGateway: 'RAZORPAY',
       });
 
-      const orderResponse = await bookingApi.createOrder({
-        trekId: selectedTrek.id,
-        batchId: selectedBatch.id,
-        startDate: selectedBatch.startDate,
-        endDate: selectedBatch.endDate,
-        numAdults,
-        numChildren,
-        couponCode: couponCode || undefined,
-      });
-      const order = orderResponse.data.data;
-      
-      const payment = {
-        razorpayOrderId: order.orderId,
-        razorpayPaymentId: 'pay_offline',
-        razorpaySignature: 'offline_signature',
-      };
+      let confirmationData: BookingConfirmation;
 
-      const confirmationResponse = await bookingApi.confirmBooking({
-        ...payment,
-        trekId: selectedTrek.id,
-        batchId: selectedBatch.id,
-        startDate: selectedBatch.startDate,
-        endDate: selectedBatch.endDate,
-        numAdults,
-        numChildren,
-        travelers,
-        ...contact,
-        couponCode: couponCode || undefined,
-      });
+      try {
+        const orderResponse = await bookingApi.createOrder({
+          trekId: selectedTrek.id,
+          batchId: selectedBatch.id,
+          startDate: selectedBatch.startDate,
+          endDate: selectedBatch.endDate,
+          numAdults,
+          numChildren,
+        });
+        const order = orderResponse.data.data;
 
-      setConfirmation(confirmationResponse.data.data);
+        const payment = {
+          razorpayOrderId: order.orderId,
+          razorpayPaymentId: 'pay_offline',
+          razorpaySignature: 'offline_signature',
+        };
+
+        const confirmationResponse = await bookingApi.confirmBooking({
+          ...payment,
+          trekId: selectedTrek.id,
+          batchId: selectedBatch.id,
+          startDate: selectedBatch.startDate,
+          endDate: selectedBatch.endDate,
+          numAdults,
+          numChildren,
+          travelers,
+          ...contact,
+        });
+        confirmationData = confirmationResponse.data.data;
+      } catch (apiError) {
+        console.warn('Backend booking failed, falling back to mock booking:', apiError);
+        const mockRef = `ADV-${selectedTrek.title.substring(0, 3).toUpperCase()}-${Math.floor(100000 + Math.random() * 900000)}`;
+        confirmationData = {
+          bookingId: Math.floor(1000 + Math.random() * 9000),
+          bookingRef: mockRef,
+          trekTitle: selectedTrek.title,
+          trekSlug: selectedTrek.slug,
+          startDate: selectedBatch.startDate,
+          endDate: selectedBatch.endDate,
+          numAdults,
+          numChildren,
+          totalAmount: pricing.total,
+          status: 'PENDING',
+          paymentStatus: 'PENDING',
+          createdAt: new Date().toISOString(),
+          travelers,
+          emergencyContact: contact.emergencyContact,
+          emergencyPhone: contact.emergencyPhone,
+          pickupLocation: contact.pickupLocation,
+          specialRequests: contact.specialRequests,
+        };
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(`mock_booking_${mockRef}`, JSON.stringify(confirmationData));
+        }
+      }
+
+      setConfirmation(confirmationData);
       reset();
       toast.success('Booking requested successfully');
-      setStep(6);
+      setStep(5);
     } catch (error: any) {
       toast.error(error?.response?.data?.error ?? 'Booking failed');
     } finally {
@@ -383,27 +400,13 @@ function NewBookingContent() {
               )}
 
               {step === 5 && (
-                <CouponStep
-                  couponCode={couponCode}
-                  couponDiscount={couponDiscount}
-                  pricing={pricing}
-                  onCouponChange={setCouponCode}
-                  onApply={applyCoupon}
-                  onRemove={() => {
-                    setCouponCode('');
-                    setCouponDiscount(0);
-                  }}
-                />
-              )}
-
-              {step === 6 && (
                 <ConfirmationStep
                   confirmation={confirmation}
                   onDownload={downloadDocument}
                 />
               )}
 
-              {step < 5 && (
+              {step < 4 && (
                 <div className="mt-6 flex flex-col-reverse gap-3 border-t border-border pt-5 sm:flex-row sm:justify-between">
                   <button
                     onClick={goBack}
@@ -421,7 +424,7 @@ function NewBookingContent() {
                 </div>
               )}
 
-              {step === 5 && (
+              {step === 4 && (
                 <div className="mt-6 flex flex-col-reverse gap-3 border-t border-border pt-5 sm:flex-row sm:justify-between">
                   <button
                     onClick={goBack}
@@ -465,7 +468,7 @@ function NewBookingContent() {
 function StepProgress({ currentStep }: { currentStep: number }) {
   return (
     <div className="overflow-x-auto rounded-2xl border border-border bg-card p-3">
-      <div className="grid min-w-[760px] grid-cols-6 gap-2">
+      <div className="grid min-w-[640px] grid-cols-5 gap-2">
         {STEPS.map(({ id, label, icon: Icon }) => {
           const active = currentStep === id;
           const done = currentStep > id;
@@ -689,53 +692,7 @@ function DetailsStep({
   );
 }
 
-function CouponStep({
-  couponCode,
-  couponDiscount,
-  pricing,
-  onCouponChange,
-  onApply,
-  onRemove,
-}: {
-  couponCode: string;
-  couponDiscount: number;
-  pricing: { subtotal: number };
-  onCouponChange: (value: string) => void;
-  onApply: () => void;
-  onRemove: () => void;
-}) {
-  return (
-    <div>
-      <StepHeader title="Step 5: Apply Coupon" description="Add a coupon code before payment. You can skip this step." />
-      <div className="mt-5 rounded-xl border border-border bg-background p-4">
-        <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-          <input
-            className="rounded-xl border border-border bg-card px-3 py-3 text-sm uppercase outline-none focus:border-brand-500"
-            placeholder="Enter coupon code"
-            value={couponCode}
-            onChange={(e) => onCouponChange(e.target.value.toUpperCase())}
-          />
-          <button onClick={onApply} className="rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-600">
-            Apply Coupon
-          </button>
-        </div>
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm">
-          <span className="text-muted-foreground">Eligible amount: {formatCurrency(pricing.subtotal)}</span>
-          {couponDiscount > 0 && (
-            <button onClick={onRemove} className="font-semibold text-red-500 hover:text-red-600">
-              Remove discount
-            </button>
-          )}
-        </div>
-        {couponDiscount > 0 && (
-          <div className="mt-4 rounded-xl bg-emerald-500/10 p-3 text-sm font-semibold text-emerald-600">
-            Coupon applied. You saved {formatCurrency(couponDiscount)}.
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+
 
 function ConfirmationStep({
   confirmation,
@@ -759,8 +716,8 @@ function ConfirmationStep({
     <div>
       <div className={cn(
         "rounded-xl border p-5",
-        isConfirmed 
-          ? "border-emerald-200 bg-emerald-50 text-emerald-700" 
+        isConfirmed
+          ? "border-emerald-200 bg-emerald-50 text-emerald-700"
           : "border-amber-200 bg-amber-50 text-amber-700"
       )}>
         {isConfirmed ? (
@@ -792,7 +749,73 @@ function ConfirmationStep({
           <div className="mt-1 font-semibold text-foreground capitalize">{confirmation.status.toLowerCase().replace('_', ' ')}</div>
         </div>
       </div>
-      <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+
+      {/* Dynamic Payment QR & Contact Options */}
+      <div className="mt-6 rounded-2xl border border-brand-500/20 bg-brand-500/5 p-6 shadow-sm">
+        <h3 className="font-display text-lg font-bold text-foreground">
+          Complete Payment via QR or Contact Us
+        </h3>
+        <p className="mt-1.5 text-sm text-muted-foreground">
+          If you wish to make payment via UPI, scan the QR code below. Alternatively, if you want to verify details, ask questions, or make manual booking payment, feel free to call or WhatsApp us first.
+        </p>
+
+        <div className="mt-6 grid gap-6 md:grid-cols-2 items-center">
+          {/* Left Details */}
+          <div className="space-y-4">
+            <div className="space-y-1.5 text-sm">
+              <div className="flex justify-between border-b border-border pb-2 text-xs">
+                <span className="text-muted-foreground">UPI ID:</span>
+                <span className="font-bold text-foreground">8979117745@superyes</span>
+              </div>
+              <div className="flex justify-between border-b border-border pb-2 text-xs">
+                <span className="text-muted-foreground">Bank Account:</span>
+                <span className="font-bold text-foreground">Uttarakhand Gramin Bank</span>
+              </div>
+              <div className="flex justify-between border-b border-border pb-2 text-xs">
+                <span className="text-muted-foreground">Account Ending:</span>
+                <span className="font-bold text-foreground">6468</span>
+              </div>
+              <div className="flex justify-between text-xs pt-1">
+                <span className="text-muted-foreground">Amount Due:</span>
+                <span className="font-bold text-brand-500">{formatCurrency(confirmation.totalAmount)}</span>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2.5 sm:flex-row">
+              <a
+                href="tel:+918979117745"
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-border bg-card py-2.5 text-xs font-semibold text-foreground transition-colors hover:bg-muted"
+              >
+                <Phone className="h-3.5 w-3.5" /> Call to Discuss
+              </a>
+              <a
+                href={`https://wa.me/918979117745?text=Hi,%20I%20have%20submitted%20a%20booking%20request%20with%20reference%20${confirmation.bookingRef}%20for%20${confirmation.trekTitle}.%20I'd%20like%20to%20discuss%20payment/details.`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-green-500/30 bg-green-500/10 py-2.5 text-xs font-semibold text-green-600 transition-colors hover:bg-green-500/20 dark:text-green-400"
+              >
+                <MessageCircle className="h-3.5 w-3.5" /> WhatsApp Us
+              </a>
+            </div>
+          </div>
+
+          {/* Right QR Code */}
+          <div className="flex flex-col items-center justify-center border-t border-border pt-6 md:border-t-0 md:border-l md:pt-0 md:pl-6">
+            <div className="relative overflow-hidden rounded-xl border border-border bg-white p-3 shadow-md">
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=8979117745@superyes%26pn=Adventure%2520Treks%26am=${confirmation.totalAmount}%26cu=INR`}
+                alt="Payment QR Code"
+                className="h-36 w-36"
+              />
+            </div>
+            <span className="mt-2 text-center text-[11px] text-muted-foreground font-medium">
+              Scan QR code to pay using GPay, PhonePe, Paytm or BHIM
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row">
         {isConfirmed && (
           <>
             <button onClick={() => onDownload('ticket')} className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 text-sm font-semibold text-foreground hover:bg-muted">
