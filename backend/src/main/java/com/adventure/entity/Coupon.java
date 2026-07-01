@@ -4,9 +4,11 @@ import com.adventure.entity.base.BaseEntity;
 import com.adventure.enums.DiscountType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "coupons")
@@ -60,7 +62,7 @@ public class Coupon extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "applicable_trek")
-    private Trek applicableTrek;
+    private Batch applicableTrek;
 
     @Column(name = "is_active")
     @Builder.Default
@@ -69,4 +71,7 @@ public class Coupon extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_user_id")
     private User createdByUser;
+
+    @UpdateTimestamp
+    private Instant updatedAt;
 }

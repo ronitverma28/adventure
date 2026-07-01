@@ -8,6 +8,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
@@ -19,13 +20,12 @@ public class TrekResponse {
     private String location;
     private String state;
     private String region;
+    private BigDecimal pricePerPerson;
+    private Integer altitudeMax;
+    private Integer altitudeBase;
     private Integer durationDays;
     private Integer durationNights;
     private DifficultyLevel difficulty;
-    private BigDecimal pricePerPerson;
-    private BigDecimal priceChild;
-    private Integer altitudeMax;
-    private Integer altitudeBase;
     private Integer groupSizeMin;
     private Integer groupSizeMax;
     private LocalDate startDate;
@@ -42,10 +42,7 @@ public class TrekResponse {
     private String coverImageUrl;
     private String metaTitle;
     private String metaDescription;
-    private String[] highlights;
-    private String[] inclusions;
-    private String[] exclusions;
-    private String[] thingsToCarry;
+    private List<String> highlights;
     private Instant createdAt;
     private Instant updatedAt;
 }

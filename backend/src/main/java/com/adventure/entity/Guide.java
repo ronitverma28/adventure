@@ -83,7 +83,7 @@ public class Guide extends BaseEntity {
     @Builder.Default
     private Boolean isVerified = false;
 
-    @ManyToMany(mappedBy = "guides")
+    @ManyToMany(mappedBy = "guides", fetch = FetchType.LAZY)
     @Builder.Default
-    private Set<Trek> treks = new HashSet<>();
+    private Set<Batch> batches = new HashSet<>();
 }

@@ -44,38 +44,49 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public ReviewResponse createReview(String email, ReviewRequest request) {
+
         if (request.getTrekId() == null) {
             throw new BadRequestException("trekId is required");
         }
 
         User user = getUser(email);
-        Trek trek = trekRepository.findByIdAndStatus(request.getTrekId(), TrekStatus.ACTIVE)
-            .orElseThrow(() -> new ResourceNotFoundException("Trek", request.getTrekId()));
 
-        if (reviewRepository.existsByTrekIdAndUserId(trek.getId(), user.getId())) {
+        Trek trek = trekRepository.findByIdAndStatus(
+                request.getTrekId(),
+                TrekStatus.ACTIVE
+        ).orElseThrow(() ->
+                new ResourceNotFoundException("Trek", request.getTrekId()));
+
+        if (reviewRepository.existsByTrekIdAndUserId(
+                trek.getId(),
+                user.getId())) {
             throw new BadRequestException("You have already reviewed this trek");
         }
 
-        boolean completedBooking = bookingRepository.existsByUserIdAndTrekIdAndStatus(
-            user.getId(),
-            trek.getId(),
-            BookingStatus.COMPLETED
-        );
+        boolean completedBooking =
+                bookingRepository.existsByUserIdAndBatchTrekIdAndStatus(
+                        user.getId(),
+                        trek.getId(),
+                        BookingStatus.COMPLETED
+                );
+
         if (!completedBooking) {
-            throw new BadRequestException("Only users with a completed booking can review this trek");
+            throw new BadRequestException(
+                    "Only users with a completed booking can review this trek"
+            );
         }
 
         Review review = Review.builder()
-            .trek(trek)
-            .user(user)
-            .rating(request.getRating())
-            .title(request.getTitle())
-            .body(request.getComment())
-            .photos(toList(request.getPhotos()))
-            .isVerified(true)
-            .isApproved(false)
-            .helpfulCount(0)
-            .build();
+                .trek(trek)
+                .user(user)
+                .rating(request.getRating())
+                .title(request.getTitle())
+                .body(request.getComment())
+                .photos(toList(request.getPhotos()))
+                .isVerified(true)
+                .isApproved(false)
+                .helpfulCount(0)
+                .build();
 
         return toReviewResponse(reviewRepository.save(review));
     }

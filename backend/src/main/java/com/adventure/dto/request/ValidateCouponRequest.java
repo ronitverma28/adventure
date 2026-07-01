@@ -12,7 +12,7 @@ public class ValidateCouponRequest {
     private String code;
 
     @NotNull
-    private Long trekId;
+    private Long batchId;
 
     @NotNull
     private BigDecimal amount;

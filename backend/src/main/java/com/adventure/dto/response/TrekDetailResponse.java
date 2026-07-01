@@ -1,6 +1,8 @@
 package com.adventure.dto.response;
 
+import com.adventure.enums.BatchStatus;
 import com.adventure.enums.DifficultyLevel;
+import com.adventure.enums.Meals;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,6 +13,7 @@ import java.util.List;
 @Data
 @Builder
 public class TrekDetailResponse {
+
     private Long id;
     private String title;
     private String slug;
@@ -43,12 +46,13 @@ public class TrekDetailResponse {
     private String coverImageUrl;
     private String metaTitle;
     private String metaDescription;
-    private String[] highlights;
-    private String[] inclusions;
-    private String[] exclusions;
-    private String[] thingsToCarry;
+    private List<String> highlights;
+    private List<String> inclusions;
+    private List<String> exclusions;
+    private List<String> thingsToCarry;
     private List<ImageResponse> images;
     private List<ItineraryResponse> itinerary;
+    private List<BatchResponse> batches;
     private List<GuideResponse> guides;
 
     @Data
@@ -74,23 +78,64 @@ public class TrekDetailResponse {
         private Integer elevationLoss;
         private Integer maxAltitude;
         private String accommodation;
-        private String[] mealsIncluded;
+        private List<Meals> mealsIncluded;
         private DifficultyLevel difficultyDay;
         private String tips;
     }
 
     @Data
     @Builder
-    public static class GuideResponse {
+    public static class BatchResponse {
+
         private Long id;
+
+        private LocalDate startDate;
+
+        private LocalDate endDate;
+
+        private Integer totalSlots;
+
+        private Integer availableSlots;
+
+        private BigDecimal pricePerPerson;
+
+        private BigDecimal pricePerChild;
+
+        private String meetingPoint;
+
+        private BatchStatus status;
+    }
+
+    @Data
+    @Builder
+    public static class GuideResponse {
+
+        private Long id;
+
         private String name;
+
         private String bio;
+
         private String photoUrl;
+
+        private String phone;
+
+        private String email;
+
         private Integer experienceYears;
-        private String[] languages;
-        private String[] certifications;
-        private String[] specializations;
+
+        private List<String> languages;
+
+        private List<String> certifications;
+
+        private List<String> specializations;
+
         private BigDecimal avgRating;
+
+        private Integer totalTreks;
+
+        private Boolean isAvailable;
+
         private Boolean isVerified;
     }
 }

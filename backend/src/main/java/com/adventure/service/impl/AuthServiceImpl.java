@@ -236,7 +236,7 @@ public class AuthServiceImpl implements AuthService {
             .state(user.getState()).country(user.getCountry())
             .isVerified(user.getIsVerified()).emailVerified(user.getEmailVerified())
             .phoneVerified(user.getPhoneVerified())
-            .roles(user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
+                .roles(user.getRoles())
             .build();
     }
 }

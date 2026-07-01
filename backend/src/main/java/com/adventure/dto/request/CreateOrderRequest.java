@@ -12,8 +12,6 @@ import java.util.List;
 @Data
 public class CreateOrderRequest {
     @NotNull
-    private Long trekId;
-
     private Long batchId;
 
     private LocalDate startDate;

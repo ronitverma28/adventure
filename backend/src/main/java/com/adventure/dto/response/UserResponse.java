@@ -1,12 +1,15 @@
 package com.adventure.dto.response;
 
+import com.adventure.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -25,7 +28,11 @@ public class UserResponse {
     private String state;
     private String country;
     private Boolean isVerified;
+    private Boolean isActive;
     private Boolean emailVerified;
     private Boolean phoneVerified;
-    private List<String> roles;
+    private Set<Role> roles;
+    private Instant createdAt;
+    private Instant updatedAt;
+
 }

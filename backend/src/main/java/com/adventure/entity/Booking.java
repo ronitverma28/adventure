@@ -2,7 +2,11 @@ package com.adventure.entity;
 
 import com.adventure.entity.base.BaseEntity;
 import com.adventure.enums.BookingStatus;
+import com.adventure.enums.PaymentStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -28,8 +32,25 @@ public class Booking extends BaseEntity {
     private String bookingRef;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "trek_id", nullable = false)
-    private Trek trek;
+    @JoinColumn(name = "batch_id", nullable = false)
+    private Batch batch;
+
+    @NotBlank
+    @Column(nullable = false)
+    private String person;
+//
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "trek_id", nullable = false)
+//    private Trek trek;
+
+    @NotNull
+    @PositiveOrZero
+    @Column(nullable = false)
+    private Double totalAmount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentStatus paymentStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
