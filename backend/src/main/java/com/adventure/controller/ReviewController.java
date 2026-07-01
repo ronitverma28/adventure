@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Reviews", description = "User reviews and public trek ratings")
-public class ReviewController {
+public class   ReviewController {
 
     private final ReviewService reviewService;
 

@@ -5,7 +5,6 @@ import com.adventure.enums.DifficultyLevel;
 import com.adventure.enums.TrekStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Formula;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,8 +15,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "treks")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -98,15 +96,9 @@ public class Trek extends BaseEntity {
     @Column(nullable = false)
     private DifficultyLevel difficulty;
 
-    @Column(name = "price_per_person", nullable = false, precision = 10, scale = 2)
-    private BigDecimal pricePerPerson;
-
-    @Column(name = "price_child", precision = 10, scale = 2)
-    private BigDecimal priceChild;
-
     @Column(name = "group_size_min")
     @Builder.Default
-    private Integer groupSizeMin = 1;
+    private Integer groupSizeMin = 4;
 
     @Column(name = "group_size_max")
     @Builder.Default
@@ -171,14 +163,10 @@ public class Trek extends BaseEntity {
     @Builder.Default
     private List<Itinerary> itinerary = new ArrayList<>();
 
-    @ManyToMany
-    @JoinTable(
-        name = "trek_guides",
-        joinColumns = @JoinColumn(name = "trek_id"),
-        inverseJoinColumns = @JoinColumn(name = "guide_id")
-    )
+    @OneToMany(mappedBy = "trek", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("dayNumber ASC")
     @Builder.Default
-    private Set<Guide> guides = new HashSet<>();
+    private List<Batch> batches = new ArrayList<>();
 
     @OneToMany(mappedBy = "trek")
     @Builder.Default

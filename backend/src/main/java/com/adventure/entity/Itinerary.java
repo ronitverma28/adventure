@@ -1,6 +1,7 @@
 package com.adventure.entity;
 
 import com.adventure.enums.DifficultyLevel;
+import com.adventure.enums.Meals;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -54,7 +55,7 @@ public class Itinerary {
     @OrderColumn(name = "sort_order")
     @Column(name = "value", columnDefinition = "TEXT")
     @Builder.Default
-    private List<String> mealsIncluded = new ArrayList<>();
+    private List<Meals> mealsIncluded = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(name = "difficulty_day")

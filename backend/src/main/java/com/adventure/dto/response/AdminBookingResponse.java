@@ -12,6 +12,15 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class AdminBookingResponse {
+    private Long id;
+    private Long userId;
+    private Long trekId;
+    private Long batchId;
+    private String persons;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private BigDecimal amount;
+    private BookingStatus bookingStatus;
     private Long bookingId;
     private String bookingRef;
     private String trekTitle;
@@ -33,4 +42,5 @@ public class AdminBookingResponse {
     private String cancellationReason;
     private Instant cancelledAt;
     private Instant createdAt;
+    private Instant updatedAt;
 }

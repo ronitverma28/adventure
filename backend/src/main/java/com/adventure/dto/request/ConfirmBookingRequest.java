@@ -24,9 +24,8 @@ public class ConfirmBookingRequest {
     private String paymentId;
     private String paymentSignature;
 
-    @NotNull
-    private Long trekId;
 
+    @NotNull
     private Long batchId;
 
     private LocalDate startDate;

@@ -19,51 +19,78 @@ import java.util.Optional;
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     Page<Booking> findByUserId(Long userId, Pageable pageable);
-    Page<Booking> findByTrekId(Long trekId, Pageable pageable);
 
     Optional<Booking> findByBookingRef(String bookingRef);
-    Optional<Booking> findByBookingRefAndUserId(String bookingRef, Long userId);
-    boolean existsByUserIdAndTrekIdAndStatus(Long userId, Long trekId, BookingStatus status);
 
-    List<Booking> findByTrekIdAndTrekDateAndStatusIn(
-        Long trekId, LocalDate trekDate, List<BookingStatus> statuses
+    Optional<Booking> findByBookingRefAndUserId(String bookingRef, Long userId);
+
+    boolean existsByUserIdAndBatchTrekIdAndStatus(
+            Long userId,
+            Long trekId,
+            BookingStatus status
+    );
+
+    Page<Booking> findByBookingRefContainingIgnoreCase(
+            String bookingRef,
+            Pageable pageable
+    );
+
+    Page<Booking> findByStatus(
+            BookingStatus status,
+            Pageable pageable
+    );
+
+
+    Page<Booking> findByStatusAndBookingRefContainingIgnoreCase(
+            BookingStatus status,
+            String bookingRef,
+            Pageable pageable
+    );
+
+    List<Booking> findByBatchTrekIdAndTrekDateAndStatusIn(
+            Long trekId,
+            LocalDate trekDate,
+            List<BookingStatus> statuses
     );
 
     @Query("""
-        SELECT COALESCE(SUM(b.numAdults + b.numChildren), 0)
-        FROM Booking b
-        WHERE b.trek.id = :trekId
-        AND b.trekDate = :trekDate
-        AND b.status IN ('PENDING', 'CONFIRMED')
-        """)
+            SELECT COALESCE(SUM(b.numAdults + b.numChildren),0)
+            FROM Booking b
+            WHERE b.batch.trek.id = :trekId
+            AND b.trekDate = :trekDate
+            AND b.status IN ('PENDING','CONFIRMED')
+            """)
     Integer countConfirmedPersonsForTrekDate(
-        @Param("trekId") Long trekId,
-        @Param("trekDate") LocalDate trekDate
+            @Param("trekId") Long trekId,
+            @Param("trekDate") LocalDate trekDate
     );
 
     @Query("SELECT COALESCE(SUM(b.finalAmount), 0) FROM Booking b WHERE b.status = 'COMPLETED'")
     BigDecimal getTotalRevenue();
 
     @Query("""
-        SELECT COALESCE(SUM(b.finalAmount), 0) FROM Booking b
-        WHERE b.status = 'COMPLETED'
-        AND b.createdAt >= :from
-        """)
+            SELECT COALESCE(SUM(b.finalAmount), 0) FROM Booking b
+            WHERE b.status = 'COMPLETED'
+            AND b.createdAt >= :from
+            """)
     BigDecimal getRevenueFrom(@Param("from") Instant from);
 
     long countByStatus(BookingStatus status);
 
     @Query("""
-        SELECT b FROM Booking b
-        WHERE (:status IS NULL OR b.status = :status)
-        AND (:search IS NULL
-             OR LOWER(b.bookingRef) LIKE LOWER(CONCAT('%', :search, '%'))
-             OR LOWER(b.user.email) LIKE LOWER(CONCAT('%', :search, '%'))
-             OR LOWER(b.trek.title) LIKE LOWER(CONCAT('%', :search, '%')))
-        """)
+            SELECT b
+            FROM Booking b
+            WHERE (:status IS NULL OR b.status=:status)
+            AND (
+                :search IS NULL
+                OR LOWER(b.bookingRef) LIKE LOWER(CONCAT('%',:search,'%'))
+                OR LOWER(b.user.email) LIKE LOWER(CONCAT('%',:search,'%'))
+                OR LOWER(b.batch.trek.title) LIKE LOWER(CONCAT('%',:search,'%'))
+            )
+            """)
     Page<Booking> searchBookings(
-        @Param("status") BookingStatus status,
-        @Param("search") String search,
-        Pageable pageable
+            @Param("status") BookingStatus status,
+            @Param("search") String search,
+            Pageable pageable
     );
 }
