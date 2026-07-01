@@ -6,8 +6,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "itinerary")
@@ -50,12 +50,13 @@ public class Itinerary {
     @Column(length = 200)
     private String accommodation;
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "itinerary_meals_included", joinColumns = @JoinColumn(name = "itinerary_id"))
-    @OrderColumn(name = "sort_order")
-    @Column(name = "value", columnDefinition = "TEXT")
-    @Builder.Default
-    private List<Meals> mealsIncluded = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(
+            name = "itinerary_meals",
+            joinColumns = @JoinColumn(name = "itinerary_id")
+    )
+    @Column(name = "meal")
+    private Set<Meals> mealsIncluded = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
     @Column(name = "difficulty_day")

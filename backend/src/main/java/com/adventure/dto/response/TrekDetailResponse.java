@@ -9,6 +9,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -78,7 +79,7 @@ public class TrekDetailResponse {
         private Integer elevationLoss;
         private Integer maxAltitude;
         private String accommodation;
-        private List<Meals> mealsIncluded;
+        private Set<Meals> mealsIncluded;
         private DifficultyLevel difficultyDay;
         private String tips;
     }

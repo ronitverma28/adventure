@@ -73,12 +73,9 @@ public class CloudinaryServiceImpl implements CloudinaryService {
 
         try {
 
-            Map<String, Object> result = (Map<String, Object>) cloudinary.api().resources(
-                    ObjectUtils.asMap(
-                            "type", "upload",
-                            "max_results", PAGE_SIZE
-                    )
-            );
+            Map<String, Object> result = (Map<String, Object>) cloudinary.search()
+                    .maxResults(PAGE_SIZE)
+                    .execute();
 
             return mapFiles(result);
 
@@ -117,16 +114,15 @@ public class CloudinaryServiceImpl implements CloudinaryService {
 
         try {
 
-            Map<String, Object> result = (Map<String, Object>) cloudinary.api().resources(
-                    ObjectUtils.asMap(
-                            "asset_folder", CLOUDINARY_PARENT_FOLDER + "/" + folderName,
-                            "max_results", PAGE_SIZE
-                    )
-            );
+            Map<String, Object> result = (Map<String, Object>) cloudinary.search()
+                    .expression("asset_folder=\"" + CLOUDINARY_PARENT_FOLDER + "/" + folderName + "\"")
+                    .maxResults(PAGE_SIZE)
+                    .execute();
 
             return mapFiles(result);
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new BadRequestException("Failed to fetch Cloudinary files.");
         }
     }
