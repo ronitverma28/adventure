@@ -38,10 +38,7 @@ public class Booking extends BaseEntity {
     @NotBlank
     @Column(nullable = false)
     private String person;
-//
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "trek_id", nullable = false)
-//    private Trek trek;
+
 
     @NotNull
     @PositiveOrZero
@@ -94,18 +91,6 @@ public class Booking extends BaseEntity {
 
     @Column(name = "emergency_phone", length = 20)
     private String emergencyPhone;
-
-    @Column(name = "special_requests", columnDefinition = "TEXT")
-    private String specialRequests;
-
-    @Column(name = "medical_conditions", columnDefinition = "TEXT")
-    private String medicalConditions;
-
-    @Column(name = "pickup_location", length = 300)
-    private String pickupLocation;
-
-    @Column(columnDefinition = "TEXT")
-    private String notes;
 
     @Column(name = "cancelled_at")
     private Instant cancelledAt;

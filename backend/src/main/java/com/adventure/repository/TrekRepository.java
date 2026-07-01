@@ -3,8 +3,6 @@ package com.adventure.repository;
 import com.adventure.entity.Trek;
 import com.adventure.enums.DifficultyLevel;
 import com.adventure.enums.TrekStatus;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;

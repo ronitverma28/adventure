@@ -30,23 +30,11 @@ public class CloudinaryServiceImpl implements CloudinaryService {
 
     @Override
     @CacheEvict(value = "cloudinary-images", allEntries = true)
-    public String upload(MultipartFile file, String folder) {
-
-        try {
-
-            Map<?, ?> result = cloudinary.uploader().upload(
-                    file.getBytes(),
-                    ObjectUtils.asMap(
-                            "folder", folder,
-                            "resource_type", "auto"
-                    )
-            );
-
-            return result.get("secure_url").toString();
-
-        } catch (IOException e) {
-            throw new BadRequestException("Failed to upload file to Cloudinary.");
-        }
+    public Map uploadImage(MultipartFile file, String folder) throws IOException {
+        return cloudinary.uploader().upload(
+                file.getBytes(),
+                ObjectUtils.asMap("folder", folder)
+        );
     }
 
     @Override

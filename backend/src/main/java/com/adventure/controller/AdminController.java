@@ -5,6 +5,7 @@ import com.adventure.dto.response.*;
 import com.adventure.enums.BookingStatus;
 import com.adventure.enums.TrekStatus;
 import com.adventure.service.interfaces.AdminService;
+import com.adventure.service.interfaces.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,6 +29,7 @@ import java.util.List;
 public class AdminController {
 
     private final AdminService adminService;
+    private final PaymentService paymentService;
     // ─────────────────────────────────────────────────────────────────────────────
     // Cloudinary Management
     // ─────────────────────────────────────────────────────────────────────────────
@@ -608,5 +610,33 @@ public class AdminController {
                         null
                 )
         );
+    }
+
+    @PutMapping("/{paymentId}/verify")
+    public ResponseEntity<ApiResponse<String>> verifyPayment(@PathVariable Long paymentId) {
+
+        paymentService.verifyPayment(paymentId);
+
+        return ResponseEntity.ok(ApiResponse.success("Payment verified successfully."));
+    }
+
+    @PutMapping("/{paymentId}/reject")
+    public ResponseEntity<ApiResponse<String>> rejectPayment(
+            @PathVariable Long paymentId,
+            @RequestParam String reason
+    ) {
+
+        paymentService.rejectPayment(paymentId, reason);
+
+        return ResponseEntity.ok(ApiResponse.success("Payment rejected."));
+    }
+
+    @GetMapping("/pending")
+    public ResponseEntity<ApiResponse<List<PaymentResponse>>> getPendingPayments() {
+
+        return ResponseEntity.ok(ApiResponse.success(
+                paymentService.getPendingPayments())
+        );
+
     }
 }
