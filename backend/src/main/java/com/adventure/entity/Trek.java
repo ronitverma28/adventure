@@ -162,7 +162,6 @@ public class Trek extends BaseEntity {
     private List<Itinerary> itinerary = new ArrayList<>();
 
     @OneToMany(mappedBy = "trek", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("dayNumber ASC")
     @Builder.Default
     private List<Batch> batches = new ArrayList<>();
 

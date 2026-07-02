@@ -3,6 +3,7 @@ package com.adventure.controller;
 import com.adventure.dto.request.*;
 import com.adventure.dto.response.*;
 import com.adventure.service.interfaces.BookingService;
+import com.adventure.service.interfaces.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/bookings")
@@ -26,26 +28,76 @@ import org.springframework.web.bind.annotation.*;
 public class BookingController {
 
     private final BookingService bookingService;
+    private final PaymentService paymentService;
 
-    @PostMapping("/create-order")
-    @Operation(summary = "Create Razorpay order")
-    public ResponseEntity<ApiResponse<RazorpayOrderResponse>> createOrder(
-        @AuthenticationPrincipal UserDetails userDetails,
-        @Valid @RequestBody CreateOrderRequest request
-    ) {
-        return ResponseEntity.ok(ApiResponse.success("Payment order created",
-            bookingService.createOrder(userDetails.getUsername(), request)));
-    }
+    @PostMapping
+@Operation(summary = "Create booking")
+public ResponseEntity<ApiResponse<BookingSummaryResponse>> createBooking(
 
-    @PostMapping("/confirm")
-    @Operation(summary = "Confirm booking after payment")
-    public ResponseEntity<ApiResponse<BookingConfirmationResponse>> confirmBooking(
         @AuthenticationPrincipal UserDetails userDetails,
-        @Valid @RequestBody ConfirmBookingRequest request
-    ) {
-        return ResponseEntity.ok(ApiResponse.success("Booking confirmed",
-            bookingService.confirmBooking(userDetails.getUsername(), request)));
-    }
+
+        @Valid
+        @RequestBody CreateBookingRequest request
+
+) {
+
+    return ResponseEntity.ok(
+
+            ApiResponse.success(
+
+                    "Booking created successfully",
+
+                    bookingService.createBooking(
+                            userDetails.getUsername(),
+                            request
+                    )
+
+            )
+
+    );
+
+}
+
+@PostMapping(
+        value = "/upload-payment",
+        consumes = "multipart/form-data"
+)
+@Operation(summary = "Upload payment proof")
+public ResponseEntity<ApiResponse<String>> uploadPayment(
+
+        @AuthenticationPrincipal UserDetails userDetails,
+
+        @RequestParam String bookingRef,
+
+        @RequestParam String utrNumber,
+
+        @RequestParam MultipartFile screenshot
+
+) {
+
+    paymentService.uploadPaymentProof(
+
+            userDetails.getUsername(),
+
+            bookingRef,
+
+            utrNumber,
+
+            screenshot
+
+    );
+
+    return ResponseEntity.ok(
+
+            ApiResponse.success(
+
+                    "Payment submitted successfully."
+
+            )
+
+    );
+
+}
 
     @PostMapping("/validate-coupon")
     @Operation(summary = "Validate coupon")

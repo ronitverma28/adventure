@@ -54,8 +54,8 @@ public class Payment extends BaseEntity {
     @Column(name = "payment_screenshot")
     private String paymentScreenshot;
 
-    @Column(name = "cloudinary_public_id")
-    private String cloudinaryPublicId;
+    @Column(name = "payment_screenshot_public_id")
+    private String paymentScreenshotPublicId;
 
     @Column(name = "admin_remark", length = 500)
     private String adminRemark;
@@ -63,6 +63,8 @@ public class Payment extends BaseEntity {
     @Column(name = "verified_at")
     private Instant verifiedAt;
 
+    @Column(name = "verified_by", length = 100)
+    private String verifiedBy;
 
     @Column(name = "paid_at")
     private Instant paidAt;
