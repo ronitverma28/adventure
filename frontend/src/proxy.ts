@@ -5,7 +5,7 @@ const PROTECTED_ROUTES = ['/dashboard', '/bookings', '/profile'];
 const ADMIN_ROUTES = ['/dashboard/admin'];
 const AUTH_ROUTES = ['/login', '/register'];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Read token from cookie (set during login for SSR support)
