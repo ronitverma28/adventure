@@ -15,9 +15,9 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(
-                "https://www.himyatraa.com",
-                "https://himyatraa.com"
+        config.setAllowedOriginPatterns(List.of(
+                "https://www.himyatraa.com/**",
+                "https://himyatraa.com/**"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
