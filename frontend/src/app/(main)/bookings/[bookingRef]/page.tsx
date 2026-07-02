@@ -228,8 +228,7 @@ export default function BookingConfirmationPage() {
                   </a>
                   <a
                     href={`https://wa.me/918979117745?text=${encodeURIComponent(
-                      `Hi, I have submitted a booking request for ${booking.trekTitle} (Reference: ${booking.bookingRef}).${
-                        proof?.txnId || txnId ? ` My Transaction ID/UTR is: ${proof?.txnId || txnId}.` : ''
+                      `Hi, I have submitted a booking request for ${booking.trekTitle} (Reference: ${booking.bookingRef}).${proof?.txnId || txnId ? ` My Transaction ID/UTR is: ${proof?.txnId || txnId}.` : ''
                       } Please verify my payment.`
                     )}`}
                     target="_blank"
@@ -385,8 +384,8 @@ export default function BookingConfirmationPage() {
             >
               <FileText className="h-4 w-4" /> Invoice
             </button>
-            <Link href="/profile" className="inline-flex items-center justify-center rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white">
-              View dashboard
+            <Link href="/bookings" className="inline-flex items-center justify-center rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white">
+              My Bookings
             </Link>
           </div>
         </div>
