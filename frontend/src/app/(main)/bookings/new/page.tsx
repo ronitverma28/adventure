@@ -121,6 +121,30 @@ function NewBookingContent() {
   });
   const couponDiscount = 0;
   const [confirmation, setConfirmation] = useState<BookingConfirmation | null>(null);
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
+
+  const getValidationErrors = () => {
+    const errors: Record<string, string> = {};
+    travelers.forEach((t, i) => {
+      if (!t.name.trim()) {
+        errors[`traveler.${i}.name`] = 'Full name is required';
+      }
+      if (!t.age || t.age < 5 || t.age > 80) {
+        errors[`traveler.${i}.age`] = 'Age must be between 5 and 80';
+      }
+      if (!t.idNumber.trim()) {
+        errors[`traveler.${i}.idNumber`] = 'ID number is required';
+      }
+    });
+
+    if (!contact.emergencyContact.trim()) {
+      errors['contact.emergencyContact'] = 'Emergency contact name is required';
+    }
+    if (!phoneRegex.test(contact.emergencyPhone)) {
+      errors['contact.emergencyPhone'] = 'Enter a valid 10-digit mobile number';
+    }
+    return errors;
+  };
 
   useEffect(() => {
     let active = true;
@@ -302,14 +326,10 @@ function NewBookingContent() {
     if (step === 2 && !selectedBatch) return 'Choose a batch date';
     if (step === 3 && totalTravelers < 1) return 'Select at least one traveler';
     if (step === 4) {
-      if (travelers.some((traveler) => !traveler.name.trim() || !traveler.idNumber.trim())) {
-        return 'Add traveler names and ID numbers';
+      const errors = getValidationErrors();
+      if (Object.keys(errors).length > 0) {
+        return Object.values(errors)[0];
       }
-      if (travelers.some((traveler) => !traveler.age || traveler.age < 5 || traveler.age > 80)) {
-        return 'Traveler age must be between 5 and 80';
-      }
-      if (!contact.emergencyContact.trim()) return 'Emergency contact is required';
-      if (!phoneRegex.test(contact.emergencyPhone)) return 'Enter a valid 10-digit emergency mobile number';
     }
     return null;
   };
@@ -335,6 +355,7 @@ function NewBookingContent() {
 
     const validationError = validateCurrentStep();
     if (validationError) {
+      setShowValidationErrors(true);
       toast.error(validationError);
       return;
     }
@@ -487,6 +508,7 @@ function NewBookingContent() {
                   contact={contact}
                   onTravelerChange={updateTraveler}
                   onContactChange={setContact}
+                  errors={showValidationErrors ? getValidationErrors() : {}}
                 />
               )}
 
@@ -738,11 +760,13 @@ function DetailsStep({
   contact,
   onTravelerChange,
   onContactChange,
+  errors = {},
 }: {
   travelers: Traveler[];
   contact: ContactDetails;
   onTravelerChange: (index: number, value: Partial<Traveler>) => void;
   onContactChange: (value: ContactDetails) => void;
+  errors?: Record<string, string>;
 }) {
   return (
     <div>
@@ -755,16 +779,117 @@ function DetailsStep({
               Traveler {index + 1}{index === 0 ? ' - Leader' : ''}
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
-              <input className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:border-brand-500" placeholder="Full name" value={traveler.name} onChange={(e) => onTravelerChange(index, { name: e.target.value })} />
-              <input className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:border-brand-500" type="number" min={5} max={80} value={traveler.age} onChange={(e) => onTravelerChange(index, { age: Number(e.target.value) })} />
-              <select className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:border-brand-500" value={traveler.gender} onChange={(e) => onTravelerChange(index, { gender: e.target.value as Traveler['gender'] })}>
-                <option>Male</option><option>Female</option><option>Other</option>
-              </select>
-              <select className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:border-brand-500" value={traveler.idType} onChange={(e) => onTravelerChange(index, { idType: e.target.value as Traveler['idType'] })}>
-                <option>Aadhaar</option><option>Passport</option><option>Driving License</option><option>Voter ID</option>
-              </select>
-              <input className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:border-brand-500" placeholder="ID number" value={traveler.idNumber} onChange={(e) => onTravelerChange(index, { idNumber: e.target.value })} />
-              <input className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:border-brand-500" placeholder="Medical conditions, if any" value={traveler.medicalConditions} onChange={(e) => onTravelerChange(index, { medicalConditions: e.target.value })} />
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-foreground">
+                  Full Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  className={cn(
+                    "rounded-xl border bg-card px-3 py-2.5 text-sm outline-none transition-colors",
+                    errors[`traveler.${index}.name`]
+                      ? "border-red-500 focus:border-red-500"
+                      : "border-border focus:border-brand-500"
+                  )}
+                  placeholder="Full name"
+                  value={traveler.name}
+                  onChange={(e) => onTravelerChange(index, { name: e.target.value })}
+                />
+                {errors[`traveler.${index}.name`] && (
+                  <span className="text-[10px] font-semibold text-red-500">
+                    {errors[`traveler.${index}.name`]}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-foreground">
+                  Age <span className="text-red-500">*</span>
+                </label>
+                <input
+                  className={cn(
+                    "rounded-xl border bg-card px-3 py-2.5 text-sm outline-none transition-colors",
+                    errors[`traveler.${index}.age`]
+                      ? "border-red-500 focus:border-red-500"
+                      : "border-border focus:border-brand-500"
+                  )}
+                  type="number"
+                  min={5}
+                  max={80}
+                  placeholder="Age"
+                  value={traveler.age || ''}
+                  onChange={(e) => onTravelerChange(index, { age: Number(e.target.value) })}
+                />
+                {errors[`traveler.${index}.age`] && (
+                  <span className="text-[10px] font-semibold text-red-500">
+                    {errors[`traveler.${index}.age`]}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-foreground">
+                  Gender <span className="text-red-500">*</span>
+                </label>
+                <select
+                  className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:border-brand-500"
+                  value={traveler.gender}
+                  onChange={(e) => onTravelerChange(index, { gender: e.target.value as Traveler['gender'] })}
+                >
+                  <option>Male</option>
+                  <option>Female</option>
+                  <option>Other</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-foreground">
+                  ID Type <span className="text-red-500">*</span>
+                </label>
+                <select
+                  className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:border-brand-500"
+                  value={traveler.idType}
+                  onChange={(e) => onTravelerChange(index, { idType: e.target.value as Traveler['idType'] })}
+                >
+                  <option>Aadhaar</option>
+                  <option>Passport</option>
+                  <option>Driving License</option>
+                  <option>Voter ID</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-foreground">
+                  ID Number <span className="text-red-500">*</span>
+                </label>
+                <input
+                  className={cn(
+                    "rounded-xl border bg-card px-3 py-2.5 text-sm outline-none transition-colors",
+                    errors[`traveler.${index}.idNumber`]
+                      ? "border-red-500 focus:border-red-500"
+                      : "border-border focus:border-brand-500"
+                  )}
+                  placeholder="ID number"
+                  value={traveler.idNumber}
+                  onChange={(e) => onTravelerChange(index, { idNumber: e.target.value })}
+                />
+                {errors[`traveler.${index}.idNumber`] && (
+                  <span className="text-[10px] font-semibold text-red-500">
+                    {errors[`traveler.${index}.idNumber`]}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-foreground">
+                  Medical Conditions
+                </label>
+                <input
+                  className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:border-brand-500"
+                  placeholder="Medical conditions, if any"
+                  value={traveler.medicalConditions || ''}
+                  onChange={(e) => onTravelerChange(index, { medicalConditions: e.target.value })}
+                />
+              </div>
             </div>
           </div>
         ))}
@@ -773,10 +898,73 @@ function DetailsStep({
       <div className="mt-5 rounded-xl border border-border bg-background p-4">
         <h3 className="font-display text-lg font-bold text-foreground">Emergency & Pickup</h3>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <input className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:border-brand-500" placeholder="Emergency contact name" value={contact.emergencyContact} onChange={(e) => onContactChange({ ...contact, emergencyContact: e.target.value })} />
-          <input className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:border-brand-500" placeholder="10-digit mobile number" value={contact.emergencyPhone} onChange={(e) => onContactChange({ ...contact, emergencyPhone: e.target.value })} />
-          <input className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:border-brand-500 sm:col-span-2" placeholder="Pickup location" value={contact.pickupLocation} onChange={(e) => onContactChange({ ...contact, pickupLocation: e.target.value })} />
-          <textarea className="min-h-24 rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:border-brand-500 sm:col-span-2" placeholder="Special requests" value={contact.specialRequests} onChange={(e) => onContactChange({ ...contact, specialRequests: e.target.value })} />
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-semibold text-foreground">
+              Emergency Contact Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              className={cn(
+                "rounded-xl border bg-card px-3 py-2.5 text-sm outline-none transition-colors",
+                errors['contact.emergencyContact']
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-border focus:border-brand-500"
+              )}
+              placeholder="Emergency contact name"
+              value={contact.emergencyContact}
+              onChange={(e) => onContactChange({ ...contact, emergencyContact: e.target.value })}
+            />
+            {errors['contact.emergencyContact'] && (
+              <span className="text-[10px] font-semibold text-red-500">
+                {errors['contact.emergencyContact']}
+              </span>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-semibold text-foreground">
+              Emergency Mobile Number <span className="text-red-500">*</span>
+            </label>
+            <input
+              className={cn(
+                "rounded-xl border bg-card px-3 py-2.5 text-sm outline-none transition-colors",
+                errors['contact.emergencyPhone']
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-border focus:border-brand-500"
+              )}
+              placeholder="10-digit mobile number"
+              value={contact.emergencyPhone}
+              onChange={(e) => onContactChange({ ...contact, emergencyPhone: e.target.value })}
+            />
+            {errors['contact.emergencyPhone'] && (
+              <span className="text-[10px] font-semibold text-red-500">
+                {errors['contact.emergencyPhone']}
+              </span>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1 sm:col-span-2">
+            <label className="text-xs font-semibold text-foreground">
+              Pickup Location
+            </label>
+            <input
+              className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:border-brand-500"
+              placeholder="Pickup location"
+              value={contact.pickupLocation || ''}
+              onChange={(e) => onContactChange({ ...contact, pickupLocation: e.target.value })}
+            />
+          </div>
+
+          <div className="flex flex-col gap-1 sm:col-span-2">
+            <label className="text-xs font-semibold text-foreground">
+              Special Requests
+            </label>
+            <textarea
+              className="min-h-24 rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:border-brand-500"
+              placeholder="Special requests"
+              value={contact.specialRequests || ''}
+              onChange={(e) => onContactChange({ ...contact, specialRequests: e.target.value })}
+            />
+          </div>
         </div>
       </div>
     </div>
