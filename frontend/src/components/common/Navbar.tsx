@@ -55,7 +55,7 @@ export function Navbar() {
                 <Mountain className="h-5 w-5 text-white" />
               </div>
               <span className={cn('font-display text-xl font-bold', brandTextColor)}>
-                Adventure
+                HimYatraa
               </span>
             </a>
 
