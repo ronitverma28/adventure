@@ -154,12 +154,67 @@ function NewBookingContent() {
     [selectedTrekSlug, treks]
   );
 
+  const [selectedTrekBatches, setSelectedTrekBatches] = useState<TrekBatchDate[]>([]);
+  const [batchesLoading, setBatchesLoading] = useState(false);
+
   useEffect(() => {
     if (selectedTrek && !contact.pickupLocation) {
       setContact((curr) => ({ ...curr, pickupLocation: selectedTrek.location || '' }));
     }
   }, [selectedTrek, contact.pickupLocation]);
-  const batches = selectedTrek?.upcomingBatches ?? [];
+
+  useEffect(() => {
+    if (!selectedTrek) {
+      setSelectedTrekBatches([]);
+      return;
+    }
+
+    let active = true;
+    async function loadBatches() {
+      setBatchesLoading(true);
+      try {
+        const availabilityResponse = await trekApi.getAvailability(selectedTrek!.id);
+        if (!active) return;
+        
+        const mappedBatches: TrekBatchDate[] = availabilityResponse.data.data.map((batch) => ({
+          id: batch.batchId,
+          startDate: batch.startDate,
+          endDate: batch.endDate,
+          availableSeats: batch.availableSlots,
+          totalSeats: batch.totalSlots,
+          price: batch.pricePerPerson,
+        }));
+        
+        setSelectedTrekBatches(mappedBatches);
+        
+        if (initialBatchId && mappedBatches.some(b => b.id === initialBatchId)) {
+          setSelectedBatchId(initialBatchId);
+        } else if (mappedBatches.length > 0) {
+          setSelectedBatchId(mappedBatches[0].id);
+        }
+      } catch (error) {
+        console.warn('Failed to load batches from API, falling back to mock or trek data:', error);
+        if (active) {
+          const fallbackBatches = selectedTrek!.upcomingBatches ?? [];
+          setSelectedTrekBatches(fallbackBatches);
+          if (initialBatchId && fallbackBatches.some(b => b.id === initialBatchId)) {
+            setSelectedBatchId(initialBatchId);
+          } else if (fallbackBatches.length > 0) {
+            setSelectedBatchId(fallbackBatches[0].id);
+          }
+        }
+      } finally {
+        if (active) setBatchesLoading(false);
+      }
+    }
+
+    loadBatches();
+    return () => {
+      active = false;
+    };
+  }, [selectedTrek?.id, selectedTrek, initialBatchId]);
+
+  const batches = selectedTrekBatches;
   const selectedBatch = batches.find((item) => item.id === selectedBatchId) ?? batches[0] ?? null;
   const totalTravelers = numAdults + numChildren;
   const adultPrice = selectedBatch?.price ?? selectedTrek?.pricePerPerson ?? 0;
@@ -204,9 +259,8 @@ function NewBookingContent() {
   }
 
   const selectTrek = (trek: Trek) => {
-    const firstBatch = trek.upcomingBatches?.[0];
     setSelectedTrekSlug(trek.slug);
-    setSelectedBatchId(firstBatch?.id ?? 0);
+    setSelectedBatchId(0);
     setContact((current) => ({ ...current, pickupLocation: trek.location }));
   };
 
@@ -388,12 +442,19 @@ function NewBookingContent() {
               )}
 
               {step === 2 && selectedTrek && (
-                <ChooseDateStep
-                  trek={selectedTrek}
-                  batches={batches}
-                  selectedBatch={selectedBatch}
-                  onSelect={(batch) => setSelectedBatchId(batch.id)}
-                />
+                batchesLoading ? (
+                  <div className="flex min-h-[200px] flex-col items-center justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin text-brand-500" />
+                    <p className="mt-2 text-sm text-muted-foreground">Loading available batches...</p>
+                  </div>
+                ) : (
+                  <ChooseDateStep
+                    trek={selectedTrek}
+                    batches={batches}
+                    selectedBatch={selectedBatch}
+                    onSelect={(batch) => setSelectedBatchId(batch.id)}
+                  />
+                )
               )}
 
               {step === 3 && (

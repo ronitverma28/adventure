@@ -299,6 +299,19 @@ public class TrekServiceImpl implements TrekService {
                                         .build())
                                 .toList()
                 )
+                .batches(trek.getBatches().stream()
+                        .map(batch -> TrekDetailResponse.BatchResponse.builder()
+                                .id(batch.getId())
+                                .startDate(batch.getStartDate())
+                                .endDate(batch.getEndDate())
+                                .totalSlots(batch.getTotalSlots())
+                                .availableSlots(batch.getAvailableSlots())
+                                .pricePerPerson(batch.getPricePerPerson())
+                                .pricePerChild(batch.getPricePerChild())
+                                .meetingPoint(batch.getMeetingPoint())
+                                .status(batch.getStatus())
+                                .build())
+                        .toList())
                 .build();
     }
 
