@@ -13,7 +13,6 @@ import com.adventure.service.interfaces.AdminService;
 import com.adventure.service.interfaces.CloudinaryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -59,32 +58,32 @@ public class AdminServiceImpl implements AdminService {
         if (monthlyRevenue == null) monthlyRevenue = BigDecimal.ZERO;
 
         List<AdminStatsResponse.PopularTrek> popular = trekRepository
-            .findAll(Pageable.ofSize(5)).stream()
-            .sorted((a, b) -> Integer.compare(b.getTotalBookings(), a.getTotalBookings()))
-            .map(t -> AdminStatsResponse.PopularTrek.builder()
-                .id(t.getId())
-                .title(t.getTitle())
-                .slug(t.getSlug())
-                .totalBookings(t.getTotalBookings())
-                .avgRating(t.getAvgRating() != null ? t.getAvgRating().doubleValue() : 0)
-                .build())
-            .toList();
+                .findAll(Pageable.ofSize(5)).stream()
+                .sorted((a, b) -> Integer.compare(b.getTotalBookings(), a.getTotalBookings()))
+                .map(t -> AdminStatsResponse.PopularTrek.builder()
+                        .id(t.getId())
+                        .title(t.getTitle())
+                        .slug(t.getSlug())
+                        .totalBookings(t.getTotalBookings())
+                        .avgRating(t.getAvgRating() != null ? t.getAvgRating().doubleValue() : 0)
+                        .build())
+                .toList();
 
         return AdminStatsResponse.builder()
-            .totalUsers(userRepository.count())
-            .totalTreks(trekRepository.count())
-            .totalBookings(bookingRepository.count())
-            .confirmedBookings(bookingRepository.countByStatus(BookingStatus.CONFIRMED))
-            .pendingBookings(bookingRepository.countByStatus(BookingStatus.PENDING))
-            .cancelledBookings(bookingRepository.countByStatus(BookingStatus.CANCELLED))
-            .totalRevenue(totalRevenue)
-            .monthlyRevenue(monthlyRevenue)
-            .totalReviews(reviewRepository.count())
-            .pendingReviews(reviewRepository.countByIsApproved(false))
-            .totalGuides(guideRepository.count())
-            .activeCoupons(couponRepository.count())
-            .popularTreks(popular)
-            .build();
+                .totalUsers(userRepository.count())
+                .totalTreks(trekRepository.count())
+                .totalBookings(bookingRepository.count())
+                .confirmedBookings(bookingRepository.countByStatus(BookingStatus.CONFIRMED))
+                .pendingBookings(bookingRepository.countByStatus(BookingStatus.PENDING))
+                .cancelledBookings(bookingRepository.countByStatus(BookingStatus.CANCELLED))
+                .totalRevenue(totalRevenue)
+                .monthlyRevenue(monthlyRevenue)
+                .totalReviews(reviewRepository.count())
+                .pendingReviews(reviewRepository.countByIsApproved(false))
+                .totalGuides(guideRepository.count())
+                .activeCoupons(couponRepository.count())
+                .popularTreks(popular)
+                .build();
     }
 
     // ── Trek management ───────────────────────────────────────────────────────
@@ -345,7 +344,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public TrekDetailResponse.ItineraryResponse addItineraryDay(Long trekId,ItineraryRequest request) {
+    public TrekDetailResponse.ItineraryResponse addItineraryDay(Long trekId, ItineraryRequest request) {
 
         Trek trek = trekRepository.findById(trekId)
                 .orElseThrow(() ->
@@ -372,7 +371,7 @@ public class AdminServiceImpl implements AdminService {
                 .accommodation(request.getAccommodation())
                 .mealsIncluded(
                         request.getMealsIncluded() == null
-                                ? new ArrayList<>()
+                                ? new HashSet<>()
                                 : request.getMealsIncluded()
                 )
                 .difficultyDay(request.getDifficultyDay())
@@ -386,7 +385,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public TrekDetailResponse.ItineraryResponse updateItineraryDay(Long itineraryId,ItineraryRequest request) {
+    public TrekDetailResponse.ItineraryResponse updateItineraryDay(Long itineraryId, ItineraryRequest request) {
 
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
                 .orElseThrow(() ->
@@ -415,7 +414,7 @@ public class AdminServiceImpl implements AdminService {
         itinerary.setAccommodation(request.getAccommodation());
         itinerary.setMealsIncluded(
                 request.getMealsIncluded() == null
-                        ? new ArrayList<>()
+                        ? new HashSet<>()
                         : request.getMealsIncluded()
         );
         itinerary.setDifficultyDay(request.getDifficultyDay());
@@ -440,7 +439,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public TrekDetailResponse.BatchResponse createBatch(Long trekId,BatchRequest request) {
+    public TrekDetailResponse.BatchResponse createBatch(Long trekId, BatchRequest request) {
 
         Trek trek = trekRepository.findById(trekId)
                 .orElseThrow(() ->
@@ -491,7 +490,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public TrekDetailResponse.BatchResponse updateBatch(Long batchId,BatchRequest request) {
+    public TrekDetailResponse.BatchResponse updateBatch(Long batchId, BatchRequest request) {
 
         Batch batch = batchRepository.findById(batchId)
                 .orElseThrow(() ->
@@ -666,7 +665,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public AdminGuideResponse updateGuide(Long guideId,GuideRequest request) {
+    public AdminGuideResponse updateGuide(Long guideId, GuideRequest request) {
 
         Guide guide = guideRepository.findById(guideId)
                 .orElseThrow(() ->
@@ -817,7 +816,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional(readOnly = true)
-    public PagedResponse<AdminBookingResponse> getAllBookings(String status,String search,Pageable pageable) {
+    public PagedResponse<AdminBookingResponse> getAllBookings(String status, String search, Pageable pageable) {
 
         Page<Booking> page;
 
@@ -869,7 +868,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public AdminBookingResponse updateBookingStatus(String bookingRef,BookingStatus status) {
+    public AdminBookingResponse updateBookingStatus(String bookingRef, BookingStatus status) {
 
         Booking booking = bookingRepository.findByBookingRef(bookingRef)
                 .orElseThrow(() ->
@@ -904,7 +903,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional(readOnly = true)
-    public PagedResponse<AdminReviewResponse> getAllReviews(Boolean approved,Pageable pageable) {
+    public PagedResponse<AdminReviewResponse> getAllReviews(Boolean approved, Pageable pageable) {
 
         Page<Review> page;
 
@@ -1077,7 +1076,6 @@ public class AdminServiceImpl implements AdminService {
     }
 
 
-
     private Trek buildTrek(AdminTrekRequest request) {
 
         return Trek.builder()
@@ -1114,7 +1112,7 @@ public class AdminServiceImpl implements AdminService {
                 .build();
     }
 
-    private void saveImages(Trek trek,List<TrekImageRequest> requests) {
+    private void saveImages(Trek trek, List<TrekImageRequest> requests) {
         if (requests == null || requests.isEmpty()) {
             return;
         }
@@ -1139,7 +1137,7 @@ public class AdminServiceImpl implements AdminService {
         }
     }
 
-    private void saveItinerary(Trek trek,List<ItineraryRequest> requests) {
+    private void saveItinerary(Trek trek, List<ItineraryRequest> requests) {
 
         if (requests == null || requests.isEmpty()) {
             return;
@@ -1159,7 +1157,7 @@ public class AdminServiceImpl implements AdminService {
                     .accommodation(request.getAccommodation())
                     .mealsIncluded(
                             request.getMealsIncluded() == null
-                                    ? new ArrayList<>()
+                                    ? new HashSet<>()
                                     : request.getMealsIncluded()
                     )
                     .difficultyDay(request.getDifficultyDay())
@@ -1170,7 +1168,7 @@ public class AdminServiceImpl implements AdminService {
         }
     }
 
-    private void saveBatches(Trek trek,List<BatchRequest> requests) {
+    private void saveBatches(Trek trek, List<BatchRequest> requests) {
 
         if (requests == null || requests.isEmpty()) {
             return;
@@ -1286,21 +1284,21 @@ public class AdminServiceImpl implements AdminService {
         );
     }
 
-    private void replaceImages(Trek trek,List<TrekImageRequest> requests) {
+    private void replaceImages(Trek trek, List<TrekImageRequest> requests) {
 
         trek.getImages().clear();
 
         saveImages(trek, requests);
     }
 
-    private void replaceItinerary(Trek trek,List<ItineraryRequest> requests) {
+    private void replaceItinerary(Trek trek, List<ItineraryRequest> requests) {
 
         trek.getItinerary().clear();
 
         saveItinerary(trek, requests);
     }
 
-    private void replaceBatches(Trek trek,List<BatchRequest> requests) {
+    private void replaceBatches(Trek trek, List<BatchRequest> requests) {
 
         trek.getBatches().clear();
 

@@ -2,11 +2,14 @@ package com.adventure.dto.request;
 
 import com.adventure.enums.DifficultyLevel;
 import com.adventure.enums.Meals;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Set;
 
 @Data
 public class ItineraryRequest {
@@ -32,7 +35,7 @@ public class ItineraryRequest {
 
     private String accommodation;
 
-    private List<Meals> mealsIncluded;
+    private Set<Meals> mealsIncluded;
 
     private DifficultyLevel difficultyDay;
 

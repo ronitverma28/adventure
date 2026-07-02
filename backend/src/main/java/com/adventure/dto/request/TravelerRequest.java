@@ -25,6 +25,5 @@ public class TravelerRequest {
     @NotBlank
     private String idNumber;
 
-    private String medicalConditions;
     private Boolean isLeader = false;
 }

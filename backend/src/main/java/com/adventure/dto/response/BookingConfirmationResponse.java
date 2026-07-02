@@ -28,6 +28,4 @@ public class BookingConfirmationResponse {
     private List<TravelerResponse> travelers;
     private String emergencyContact;
     private String emergencyPhone;
-    private String pickupLocation;
-    private String specialRequests;
 }

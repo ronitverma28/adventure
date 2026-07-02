@@ -198,8 +198,6 @@ public class BookingServiceImpl implements BookingService {
 
                 .emergencyContact(request.getEmergencyContact())
                 .emergencyPhone(request.getEmergencyPhone())
-                .pickupLocation(request.getPickupLocation())
-                .specialRequests(request.getSpecialRequests())
 
                 .build();
 
@@ -218,11 +216,7 @@ public class BookingServiceImpl implements BookingService {
                 .amount(price.total())
                 .currency(currency)
 
-                .gateway(PaymentGateway.RAZORPAY)
 
-                .gatewayOrderId(request.getRazorpayOrderId())
-                .gatewayPaymentId(request.getRazorpayPaymentId())
-                .gatewaySignature(request.getRazorpaySignature())
 
                 .status(PaymentStatus.SUCCESS)
 
@@ -886,19 +880,19 @@ public class BookingServiceImpl implements BookingService {
                 ADVENTURE PLATFORM - TREK TICKET
                 Booking Ref: %s
                 Status: %s
-                
+
                 Trek: %s
                 Location: %s, %s
                 Travel Dates: %s - %s
                 Travelers: %d
-                
+
                 Emergency Contact: %s
                 Emergency Phone: %s
                 Pickup Location: %s
-                
+
                 Traveler List:
                 %s
-                
+
                 Please carry a government ID, required trek gear, and this ticket at reporting.
                 """.formatted(
                 booking.getBookingRef(),
@@ -924,15 +918,15 @@ public class BookingServiceImpl implements BookingService {
                 Booking Ref: %s
                 Payment Status: %s
                 Payment ID: %s
-                
+
                 Trek: %s
                 Trek Date: %s
-                
+
                 Base Amount: INR %s
                 Discount: INR %s
                 GST: INR %s
                 Total Paid: INR %s
-                
+
                 This invoice was generated electronically.
                 """.formatted(
                 booking.getUser().getName(),

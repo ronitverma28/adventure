@@ -1,7 +1,6 @@
 package com.adventure.entity;
 
 import com.adventure.entity.base.BaseEntity;
-import com.adventure.enums.PaymentGateway;
 import com.adventure.enums.PaymentMethod;
 import com.adventure.enums.PaymentStatus;
 import jakarta.persistence.*;
@@ -42,24 +41,28 @@ public class Payment extends BaseEntity {
     private String currency = "INR";
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private PaymentGateway gateway;
-
-    @Column(name = "gateway_order_id", length = 200)
-    private String gatewayOrderId;
-
-    @Column(name = "gateway_payment_id", length = 200)
-    private String gatewayPaymentId;
-
-    @Column(name = "gateway_signature", length = 500)
-    private String gatewaySignature;
-
-    @Enumerated(EnumType.STRING)
     @Builder.Default
     private PaymentStatus status = PaymentStatus.PENDING;
 
     @Enumerated(EnumType.STRING)
-    private PaymentMethod method;
+    @Builder.Default
+    private PaymentMethod method = PaymentMethod.UPI;
+
+    @Column(name = "utr_number", unique = true, length = 50)
+    private String utrNumber;
+
+    @Column(name = "payment_screenshot")
+    private String paymentScreenshot;
+
+    @Column(name = "cloudinary_public_id")
+    private String cloudinaryPublicId;
+
+    @Column(name = "admin_remark", length = 500)
+    private String adminRemark;
+
+    @Column(name = "verified_at")
+    private Instant verifiedAt;
+
 
     @Column(name = "paid_at")
     private Instant paidAt;
