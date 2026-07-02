@@ -86,7 +86,7 @@ export default function ContactPage() {
                 </a>
 
                 <a 
-                  href="mailto:ukcode07@gmail.com"
+                  href="mailto:riteshthapliyal07@gmail.com"
                   className="flex items-start gap-4 group p-3 -m-3 rounded-xl hover:bg-muted/50 transition-colors"
                 >
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500">
@@ -95,7 +95,7 @@ export default function ContactPage() {
                   <div>
                     <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Email Us</div>
                     <div className="mt-1 text-sm font-semibold text-foreground group-hover:text-blue-500 transition-colors">
-                      ukcode07@gmail.com
+                      riteshthapliyal07@gmail.com
                     </div>
                     <div className="text-xs text-muted-foreground mt-0.5">Response within 12 hours</div>
                   </div>
