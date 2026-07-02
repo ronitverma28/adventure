@@ -9,7 +9,7 @@ import {
   User, Phone, MapPin, Calendar, Camera, Save, Loader2, Lock,
   Eye, EyeOff, CheckCircle, AlertCircle, Shield, Mountain,
   CreditCard, FileText, Download, XCircle, Star, Upload,
-  Award, Activity, Backpack, Heart, Clock, CheckCircle2,
+  Award, Activity, Backpack, Clock, CheckCircle2,
   ChevronRight, Ticket,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -32,7 +32,7 @@ import type { BookingConfirmation, BookingStatus, PaymentHistory } from '@/types
 type DashboardTab =
   | 'profile' | 'security'
   | 'upcoming' | 'completed'
-  | 'wishlist' | 'payments'
+  | 'payments'
   | 'documents' | 'certificates'
   | 'fitness' | 'packing';
 
@@ -49,7 +49,6 @@ const TABS: { key: DashboardTab; label: string; icon: React.ElementType; group: 
   { key: 'security',     label: 'Security',         icon: Shield,      group: 'Account' },
   { key: 'upcoming',     label: 'Upcoming Treks',   icon: Mountain,    group: 'Treks' },
   { key: 'completed',    label: 'Completed Treks',  icon: CheckCircle2,group: 'Treks' },
-  { key: 'wishlist',     label: 'Wishlist',         icon: Heart,       group: 'Treks' },
   { key: 'payments',     label: 'Payment History',  icon: CreditCard,  group: 'Finance' },
   { key: 'documents',    label: 'Documents',        icon: FileText,    group: 'Finance' },
   { key: 'certificates', label: 'Certificates',     icon: Award,       group: 'Finance' },
@@ -345,7 +344,7 @@ export default function DashboardPage() {
   }, {});
 
   return (
-    <div className="min-h-screen bg-background pt-16">
+    <div className="min-h-screen bg-background pt-24">
       {/* Hero header */}
       <div className="border-b border-border bg-gradient-to-r from-brand-500/10 to-emerald-500/10">
         <div className="container py-8">
@@ -589,20 +588,6 @@ export default function DashboardPage() {
                   </div>
                 )}
 
-                {/* ── WISHLIST ── */}
-                {activeTab === 'wishlist' && (
-                  <div>
-                    <SectionHeader title="Wishlist" description="Treks you have saved for later" />
-                    <div className="rounded-2xl border border-border bg-card p-8 text-center">
-                      <Heart className="mx-auto h-12 w-12 text-muted-foreground/30" />
-                      <p className="mt-4 font-semibold text-foreground">Wishlist coming soon</p>
-                      <p className="mt-1 text-sm text-muted-foreground">Save treks from the listing page to see them here</p>
-                      <Link href="/treks" className="mt-5 inline-flex items-center gap-2 rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white">
-                        <Mountain className="h-4 w-4" /> Browse Treks
-                      </Link>
-                    </div>
-                  </div>
-                )}
 
                 {/* ── PAYMENT HISTORY ── */}
                 {activeTab === 'payments' && (

@@ -177,13 +177,6 @@ export function TrekReviewsSection({ trek }: { trek: Trek }) {
               {review.title && <h4 className="mt-3 font-semibold text-foreground">{review.title}</h4>}
               <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{review.comment}</p>
 
-              {(review.photos?.length ?? 0) > 0 && (
-                <div className="mt-3 flex gap-2">
-                  {review.photos?.map((photo) => (
-                    <img key={photo} src={photo} alt="Review" className="h-16 w-16 rounded-xl object-cover" />
-                  ))}
-                </div>
-              )}
 
               <div className="mt-3 flex items-center gap-2">
                 <button

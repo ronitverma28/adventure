@@ -1,4 +1,4 @@
-import { Mountain, Home, Map, Heart, User, LayoutDashboard, BookOpen } from 'lucide-react';
+import { Mountain, Home, Map, User, LayoutDashboard, BookOpen } from 'lucide-react';
 
 export const mainNavLinks = [
   { label: 'Home', href: '/' },
@@ -10,7 +10,6 @@ export const mainNavLinks = [
 
 export const userNavLinks = [
   { label: 'My Bookings', href: '/bookings', icon: BookOpen },
-  { label: 'Wishlist', href: '/wishlist', icon: Heart },
   { label: 'Profile', href: '/profile', icon: User },
 ];
 

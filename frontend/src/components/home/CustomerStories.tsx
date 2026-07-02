@@ -174,34 +174,11 @@ export function CustomerStories() {
             </motion.div>
           </AnimatePresence>
 
-          {/* Right: Story Image + Mini Cards */}
+          {/* Right: Mini Cards */}
           <div className="relative">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={story.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.5 }}
-                className="relative overflow-hidden rounded-3xl"
-              >
-                <img
-                  src={story.image}
-                  alt={story.trek}
-                  className="h-80 w-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                <div className="absolute bottom-4 left-4 rounded-xl bg-black/40 px-4 py-2 backdrop-blur-sm">
-                  <div className="text-xs text-white/60">Trek</div>
-                  <div className="font-semibold text-white">{story.trek}</div>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-
             {/* Mini story cards */}
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {STORIES.filter((_, i) => i !== active)
-                .slice(0, 2)
                 .map((s) => (
                   <button
                     key={s.id}

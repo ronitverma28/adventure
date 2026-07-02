@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Star, MapPin, Clock, Mountain, Heart, Share2, ChevronDown, Users, Award } from 'lucide-react';
+import { Star, MapPin, Clock, Mountain, Share2, ChevronDown, Users, Award } from 'lucide-react';
 import { Trek } from '@/types/trek.types';
 import { DIFFICULTY_CONFIG } from '@/lib/constants/trek.constants';
 import { cn } from '@/lib/utils/cn';
@@ -10,11 +10,9 @@ import { cn } from '@/lib/utils/cn';
 interface Props {
   trek: Trek;
   extra: { meetingPoint: string; nearestAirport: string };
-  isWishlisted: boolean;
-  onWishlist: () => void;
 }
 
-export function TrekHeroBanner({ trek, extra, isWishlisted, onWishlist }: Props) {
+export function TrekHeroBanner({ trek, extra }: Props) {
   const ref  = useRef<HTMLDivElement>(null);
   const diff = DIFFICULTY_CONFIG[trek.difficulty];
 
@@ -60,12 +58,6 @@ export function TrekHeroBanner({ trek, extra, isWishlisted, onWishlist }: Props)
 
       {/* Action buttons */}
       <div className="absolute right-4 top-24 flex gap-2 sm:right-8">
-        <button
-          onClick={onWishlist}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 backdrop-blur-sm transition-colors hover:bg-black/60"
-        >
-          <Heart className={cn('h-5 w-5 transition-all', isWishlisted ? 'fill-red-500 text-red-500' : 'text-white')} />
-        </button>
         <button
           onClick={handleShare}
           className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 backdrop-blur-sm transition-colors hover:bg-black/60"

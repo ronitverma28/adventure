@@ -4,7 +4,6 @@ import { WhyChooseUs } from '@/components/home/WhyChooseUs';
 import { HowItWorks } from '@/components/home/HowItWorks';
 import { PopularDestinations } from '@/components/home/PopularDestinations';
 import { CustomerStories } from '@/components/home/CustomerStories';
-import { GallerySection } from '@/components/home/GallerySection';
 import { CommunitySection } from '@/components/home/CommunitySection';
 import { FAQSection } from '@/components/home/FAQSection';
 
@@ -17,7 +16,6 @@ export default function HomePage() {
       <HowItWorks />
       <PopularDestinations />
       <CustomerStories />
-      <GallerySection />
       <CommunitySection />
       <FAQSection />
     </>

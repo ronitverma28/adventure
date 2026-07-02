@@ -5,9 +5,9 @@ export const siteConfig = {
     'India\'s premium adventure travel platform. Expert-guided treks, seamless booking, and unforgettable Himalayan experiences.',
   url: 'https://adventure.com',
   ogImage: '/og-image.jpg',
-  email: 'hello@adventure.com',
-  phone: '+91 98765 43210',
-  whatsapp: '+919876543210',
+  email: 'riteshthapliyal07@gmail.com',
+  phone: '+91 89791 17745',
+  whatsapp: '+918979117745',
   social: {
     instagram: 'https://instagram.com/adventuretreks',
     youtube: 'https://youtube.com/@adventuretreks',

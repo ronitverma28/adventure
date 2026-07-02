@@ -27,7 +27,6 @@ const BASE_SECTIONS = [
 export function TrekDetailPage({ trek }: { trek: TrekDetail }) {
   const [activeSection, setActiveSection] = useState('overview');
   const [navSticky, setNavSticky] = useState(false);
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
   const diff = DIFFICULTY_CONFIG[trek.difficulty];
 
@@ -86,8 +85,6 @@ export function TrekDetailPage({ trek }: { trek: TrekDetail }) {
           meetingPoint: trek.meetingPoint || trek.location,
           nearestAirport: trek.nearestAirport || 'Not specified',
         }}
-        isWishlisted={isWishlisted}
-        onWishlist={() => setIsWishlisted((value) => !value)}
       />
 
       <div ref={navRef} className="border-b border-border bg-background">

@@ -95,18 +95,6 @@ export function TrekCard({ trek, onQuickView, viewMode = 'grid' }: TrekCardProps
           )}
         </div>
 
-        {/* Wishlist */}
-        <button
-          onClick={handleWishlist}
-          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/30 backdrop-blur-sm transition-all hover:bg-black/50"
-        >
-          <Heart
-            className={cn(
-              'h-4 w-4 transition-all',
-              isWishlisted ? 'fill-red-500 text-red-500 scale-110' : 'text-white'
-            )}
-          />
-        </button>
 
         {/* Rating */}
         <div className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-black/40 px-2.5 py-1 backdrop-blur-sm">
@@ -339,9 +327,6 @@ function TrekCardList({
                 {trek.title}
               </h3>
             </div>
-            <button onClick={onWishlist}>
-              <Heart className={cn('h-5 w-5 transition-all', isWishlisted ? 'fill-red-500 text-red-500' : 'text-muted-foreground')} />
-            </button>
           </div>
           <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{trek.shortDescription}</p>
 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Mountain, Heart, User, ChevronDown, Search } from 'lucide-react';
+import { Menu, X, Mountain, User, ChevronDown, Search } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useUIStore } from '@/store/uiStore';
 import { cn } from '@/lib/utils/cn';
@@ -80,14 +80,6 @@ export function Navbar() {
             <div className="flex items-center gap-2">
               {isAuthenticated ? (
                 <>
-                  {/* Wishlist */}
-                  <a
-                    href="/wishlist"
-                    className="hidden h-9 w-9 items-center justify-center rounded-lg text-white/70 transition-colors hover:bg-white/10 hover:text-white md:flex"
-                  >
-                    <Heart className="h-4 w-4" />
-                  </a>
-
                   {/* User Menu */}
                   <div className="relative">
                     <button
@@ -129,7 +121,6 @@ export function Navbar() {
                           </div>
                           {[
                             { label: 'My Bookings', href: '/bookings' },
-                            { label: 'Wishlist', href: '/wishlist' },
                             { label: 'Profile', href: '/profile' },
                             ...(user?.roles?.includes('ROLE_ADMIN')
                               ? [{ label: 'Admin Dashboard', href: '/dashboard/admin' }]
@@ -232,9 +223,6 @@ export function Navbar() {
                   <>
                     <a href="/bookings" className="rounded-xl px-4 py-3 text-sm font-medium text-white/80 hover:bg-white/10 hover:text-white transition-colors">
                       My Bookings
-                    </a>
-                    <a href="/wishlist" className="rounded-xl px-4 py-3 text-sm font-medium text-white/80 hover:bg-white/10 hover:text-white transition-colors">
-                      Wishlist
                     </a>
                     <a href="/profile" className="rounded-xl px-4 py-3 text-sm font-medium text-white/80 hover:bg-white/10 hover:text-white transition-colors">
                       Profile
