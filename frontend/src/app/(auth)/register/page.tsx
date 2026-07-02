@@ -28,7 +28,7 @@ export default function RegisterPage() {
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
       <div className="mb-8">
         <h1 className="font-display text-3xl font-bold text-foreground">Create your account</h1>
-        <p className="mt-2 text-muted-foreground">Join 50,000+ trekkers on Adventure</p>
+        <p className="mt-2 text-muted-foreground">Join 50,000+ trekkers on HimYatraa</p>
       </div>
       <form onSubmit={handleSubmit((d) => reg(d))} className="space-y-4">
         {[{ n: 'name' as const, l: 'Full Name', t: 'text', ph: 'Rahul Sharma', ic: User, ac: 'name' },

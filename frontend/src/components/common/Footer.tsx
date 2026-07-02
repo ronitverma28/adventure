@@ -78,7 +78,7 @@ export function Footer() {
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500">
                 <Mountain className="h-5 w-5 text-white" />
               </div>
-              <span className="font-display text-xl font-bold text-white">Adventure</span>
+              <span className="font-display text-xl font-bold text-white">HimYatraa</span>
             </a>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/50">
               India&apos;s premium adventure travel platform. Expert-guided treks, seamless
@@ -151,7 +151,7 @@ export function Footer() {
       <div className="border-t border-white/10">
         <div className="container flex flex-col items-center justify-between gap-4 py-6 sm:flex-row">
           <p className="text-xs text-white/40">
-            &copy; {new Date().getFullYear()} Adventure Platform. All rights reserved.
+            &copy; {new Date().getFullYear()} HimYatraa. All rights reserved.
           </p>
           <div className="flex items-center gap-1 text-xs text-white/40">
             <span>Made with</span>

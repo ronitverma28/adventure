@@ -55,7 +55,7 @@ export function TrekSafetySection({ safetyInfo }: Props) {
         </h3>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {[
-            { label: 'Adventure Support', number: '+91 98765 43210' },
+            { label: 'HimYatraa Support', number: '+91 99972 16486' },
             { label: 'Mountain Rescue',   number: '+91 1800 180 4141' },
             { label: 'SDRF Uttarakhand',  number: '+91 135 2710334' },
           ].map((contact) => (

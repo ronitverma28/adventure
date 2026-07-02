@@ -19,7 +19,7 @@ export default function LoginPage() {
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
       <div className="mb-8">
         <h1 className="font-display text-3xl font-bold text-foreground">Welcome back</h1>
-        <p className="mt-2 text-muted-foreground">Sign in to your Adventure account</p>
+        <p className="mt-2 text-muted-foreground">Sign in to your HimYatraa account</p>
       </div>
       <form onSubmit={handleSubmit((d) => login(d))} className="space-y-5">
         <div>

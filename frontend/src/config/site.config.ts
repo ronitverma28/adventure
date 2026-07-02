@@ -1,17 +1,17 @@
 export const siteConfig = {
-  name: 'Adventure',
+  name: 'HimYatraa',
   tagline: 'Conquer Every Summit',
   description:
     'India\'s premium adventure travel platform. Expert-guided treks, seamless booking, and unforgettable Himalayan experiences.',
-  url: 'https://adventure.com',
+  url: 'https://himyatraa.com',
   ogImage: '/og-image.jpg',
   email: 'riteshthapliyal07@gmail.com',
   phone: '+91 89791 17745',
   whatsapp: '+918979117745',
   social: {
-    instagram: 'https://instagram.com/adventuretreks',
-    youtube: 'https://youtube.com/@adventuretreks',
-    facebook: 'https://facebook.com/adventuretreks',
+    instagram: 'https://instagram.com/himyatraa',
+    youtube: 'https://youtube.com/@himyatraa',
+    facebook: 'https://facebook.com/himyatraa',
   },
   stats: {
     treks: '150+',
