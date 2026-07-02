@@ -1,6 +1,5 @@
 package com.adventure.dto.response;
 
-import com.adventure.enums.PaymentGateway;
 import com.adventure.enums.PaymentStatus;
 import lombok.Builder;
 import lombok.Data;
@@ -19,10 +18,9 @@ public class PaymentHistoryResponse {
     private BigDecimal amount;
     private BigDecimal refundAmount;
     private String currency;
-    private PaymentGateway gateway;
     private PaymentStatus status;
-    private String gatewayOrderId;
-    private String gatewayPaymentId;
+    private String utrNumber;
+    private String screenshotUrl;
     private String refundId;
     private String failureReason;
     private Instant paidAt;
