@@ -158,7 +158,12 @@ export default function DashboardPage() {
   // Bookings
   const { data: bookingsData, isLoading: bookingsLoading, refetch: refetchBookings } = useQuery({
     queryKey: ['my-bookings'],
-    queryFn: () => bookingApi.getMyBookings(0, 100).then((r) => r.data.data.content),
+    queryFn: () => bookingApi.getMyBookings(0, 100).then((r) => {
+      if (!r?.data?.data?.content) {
+        throw new Error('Response format is missing content field');
+      }
+      return r.data.data.content;
+    }),
     enabled: ['upcoming', 'completed', 'documents', 'certificates'].includes(activeTab),
   });
   const allBookings: BookingConfirmation[] = bookingsData ?? [];

@@ -8,6 +8,8 @@ import type {
   PaymentHistory,
   RazorpayOrder,
   ValidateCouponRequest,
+  CreateBookingRequest,
+  BookingSummaryResponse,
 } from '@/types/booking.types';
 
 export const bookingApi = {
@@ -17,10 +19,21 @@ export const bookingApi = {
   confirmBooking: (data: ConfirmBookingRequest) =>
     apiClient.post<ApiResponse<BookingConfirmation>>('/bookings/confirm', data),
 
-  validateCoupon: (code: string, trekId: number, amount: number) =>
+  createBooking: (data: CreateBookingRequest) =>
+    apiClient.post<ApiResponse<BookingSummaryResponse>>('/bookings', data),
+
+  uploadPayment: (bookingRef: string, utrNumber: string, screenshot: File) => {
+    const formData = new FormData();
+    formData.append('screenshot', screenshot);
+    return apiClient.post<ApiResponse<string>>('/bookings/upload-payment', formData, {
+      params: { bookingRef, utrNumber },
+    });
+  },
+
+  validateCoupon: (code: string, batchId: number, amount: number) =>
     apiClient.post<ApiResponse<CouponValidation>>('/bookings/validate-coupon', {
       code,
-      trekId,
+      batchId,
       amount,
     } satisfies ValidateCouponRequest),
 

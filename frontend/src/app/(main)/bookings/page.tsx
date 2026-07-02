@@ -30,8 +30,17 @@ export default function MyBookingsPage() {
 
   useEffect(() => {
     bookingApi.getMyBookings(0, 50)
-      .then((r) => setBookings(r.data.data.content))
-      .catch(() => toast.error('Failed to load bookings'))
+      .then((r) => {
+        if (!r?.data?.data?.content) {
+          throw new Error('Response format is missing content field');
+        }
+        setBookings(r.data.data.content);
+      })
+      .catch((err) => {
+        console.error('Failed to load bookings:', err);
+        const errMsg = err?.response?.data?.error || err?.response?.data?.message || err?.message || 'Unknown error';
+        toast.error(`Failed to load bookings: ${errMsg}`);
+      })
       .finally(() => setLoading(false));
   }, []);
 

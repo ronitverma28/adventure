@@ -147,6 +147,25 @@ export interface ConfirmBookingRequest {
 
 export interface ValidateCouponRequest {
   code: string;
-  trekId: number;
+  batchId: number;
   amount: number;
+}
+
+export interface CreateBookingRequest {
+  batchId: number;
+  couponCode?: string;
+  numAdults: number;
+  numChildren?: number;
+  travelers: Traveler[];
+  emergencyContact: string;
+  emergencyPhone: string;
+}
+
+export interface BookingSummaryResponse {
+  bookingId: number;
+  bookingRef: string;
+  amount: number;
+  bookingStatus: BookingStatus;
+  paymentStatus: string;
+  message?: string;
 }

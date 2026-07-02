@@ -188,3 +188,56 @@ export interface AdminGuide {
 }
 
 export type AdminUser = User;
+
+export interface ItineraryRequest {
+  dayNumber: number;
+  title: string;
+  description: string;
+  accommodation?: string;
+  meals?: string;
+  distanceKm?: number;
+  durationHours?: number;
+}
+
+export interface TrekImageRequest {
+  imageUrl: string;
+  caption?: string;
+  isCover?: boolean;
+  displayOrder?: number;
+}
+
+export interface BatchRequest {
+  startDate: string;
+  endDate: string;
+  totalSlots: number;
+  availableSlots: number;
+  pricePerPerson: number;
+  status: string;
+}
+
+export interface PendingPayment {
+  paymentId: number;
+  bookingRef: string;
+  amount: number;
+  utrNumber: string;
+  screenshotUrl: string;
+  submittedAt: string;
+}
+
+export interface RejectPaymentRequest {
+  rejectionReason: string;
+}
+
+export interface GuideRequest {
+  name: string;
+  email: string;
+  phone?: string;
+  photoUrl?: string;
+  bio?: string;
+  experienceYears?: number;
+  languages?: string[];
+  certifications?: string[];
+  specializations?: string[];
+  isAvailable?: boolean;
+}
+

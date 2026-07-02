@@ -95,9 +95,24 @@ function NewBookingContent() {
   const [selectedBatchId, setSelectedBatchId] = useState(initialBatchId);
   const [numAdults, setNumAdults] = useState(initialTravelers);
   const [numChildren, setNumChildren] = useState(0);
-  const [travelers, setTravelers] = useState<Traveler[]>(
-    Array.from({ length: initialTravelers }, (_, index) => defaultTraveler(index))
+  const [travelers, setTravelers] = useState<Traveler[]>(() =>
+    Array.from({ length: initialTravelers }, (_, index) => {
+      const t = defaultTraveler(index);
+      if (index === 0 && user?.name) {
+        t.name = user.name;
+      }
+      return t;
+    })
   );
+
+  useEffect(() => {
+    if (user?.name) {
+      setTravelers((prev) =>
+        prev.map((t, i) => (i === 0 && !t.name ? { ...t, name: user.name } : t))
+      );
+    }
+  }, [user]);
+
   const [contact, setContact] = useState<ContactDetails>({
     emergencyContact: user?.name ?? '',
     emergencyPhone: '',
@@ -290,6 +305,9 @@ function NewBookingContent() {
       if (travelers.some((traveler) => !traveler.name.trim() || !traveler.idNumber.trim())) {
         return 'Add traveler names and ID numbers';
       }
+      if (travelers.some((traveler) => !traveler.age || traveler.age < 5 || traveler.age > 80)) {
+        return 'Traveler age must be between 5 and 80';
+      }
       if (!contact.emergencyContact.trim()) return 'Emergency contact is required';
       if (!phoneRegex.test(contact.emergencyPhone)) return 'Enter a valid 10-digit emergency mobile number';
     }
@@ -315,6 +333,12 @@ function NewBookingContent() {
       return;
     }
 
+    const validationError = validateCurrentStep();
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
+
     setProcessing(true);
     try {
       updateFormData({
@@ -334,34 +358,26 @@ function NewBookingContent() {
       let confirmationData: BookingConfirmation;
 
       try {
-        const orderResponse = await bookingApi.createOrder({
-          trekId: selectedTrek.id,
+        const createResponse = await bookingApi.createBooking({
           batchId: selectedBatch.id,
-          startDate: selectedBatch.startDate,
-          endDate: selectedBatch.endDate,
           numAdults,
           numChildren,
+          travelers: travelers.map(t => ({
+            name: t.name,
+            age: t.age,
+            gender: t.gender,
+            idType: t.idType,
+            idNumber: t.idNumber,
+            isLeader: t.isLeader ?? false
+          })),
+          emergencyContact: contact.emergencyContact,
+          emergencyPhone: contact.emergencyPhone,
         });
-        const order = orderResponse.data.data;
+        const summary = createResponse.data.data;
 
-        const payment = {
-          razorpayOrderId: order.orderId,
-          razorpayPaymentId: 'pay_offline',
-          razorpaySignature: 'offline_signature',
-        };
-
-        const confirmationResponse = await bookingApi.confirmBooking({
-          ...payment,
-          trekId: selectedTrek.id,
-          batchId: selectedBatch.id,
-          startDate: selectedBatch.startDate,
-          endDate: selectedBatch.endDate,
-          numAdults,
-          numChildren,
-          travelers,
-          ...contact,
-        });
-        confirmationData = confirmationResponse.data.data;
+        // Fetch full booking details to populate confirmation state
+        const detailsResponse = await bookingApi.getBooking(summary.bookingRef);
+        confirmationData = detailsResponse.data.data;
       } catch (apiError) {
         console.warn('Backend booking failed, falling back to mock booking:', apiError);
         const mockRef = `ADV-${selectedTrek.title.substring(0, 3).toUpperCase()}-${Math.floor(100000 + Math.random() * 900000)}`;
@@ -778,6 +794,8 @@ function ConfirmationStep({
 }) {
   const [txnId, setTxnId] = useState('');
   const [screenshot, setScreenshot] = useState<string | null>(null);
+  const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
+  const [submittingProof, setSubmittingProof] = useState(false);
   const [proof, setProof] = useState<{ txnId: string; screenshot: string } | null>(null);
 
   useEffect(() => {
@@ -805,6 +823,7 @@ function ConfirmationStep({
         toast.error('File size exceeds the 5MB limit.');
         return;
       }
+      setScreenshotFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setScreenshot(reader.result as string);
@@ -813,19 +832,28 @@ function ConfirmationStep({
     }
   };
 
-  const submitProof = () => {
+  const submitProof = async () => {
     if (!txnId.trim()) {
       toast.error('Please enter the Transaction ID / UTR');
       return;
     }
-    if (!screenshot) {
+    if (!screenshotFile) {
       toast.error('Please upload a screenshot of your payment');
       return;
     }
-    const data = { txnId: txnId.trim(), screenshot };
-    localStorage.setItem(`payment_proof_${confirmation.bookingRef}`, JSON.stringify(data));
-    setProof(data);
-    toast.success('Payment proof submitted successfully! Our team will verify it shortly.');
+    setSubmittingProof(true);
+    try {
+      await bookingApi.uploadPayment(confirmation.bookingRef, txnId.trim(), screenshotFile);
+      const data = { txnId: txnId.trim(), screenshot: screenshot || '' };
+      localStorage.setItem(`payment_proof_${confirmation.bookingRef}`, JSON.stringify(data));
+      setProof(data);
+      toast.success('Payment proof submitted successfully! Our team will verify it shortly.');
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err?.response?.data?.message || 'Failed to submit payment proof');
+    } finally {
+      setSubmittingProof(false);
+    }
   };
 
   const isConfirmed = confirmation.status === 'CONFIRMED';
@@ -964,6 +992,7 @@ function ConfirmationStep({
                   localStorage.removeItem(`payment_proof_${confirmation.bookingRef}`);
                   setProof(null);
                   setScreenshot(null);
+                  setScreenshotFile(null);
                   setTxnId('');
                 }}
                 className="mt-4 text-xs font-semibold text-red-500 hover:text-red-600"
@@ -984,8 +1013,9 @@ function ConfirmationStep({
                 type="text"
                 placeholder="e.g. 512345678901"
                 value={txnId}
+                disabled={submittingProof}
                 onChange={(e) => setTxnId(e.target.value)}
-                className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-foreground placeholder-muted-foreground outline-none focus:border-brand-500"
+                className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-foreground placeholder-muted-foreground outline-none focus:border-brand-500 disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
             <div>
@@ -995,8 +1025,12 @@ function ConfirmationStep({
                   <div className="relative h-40 w-full overflow-hidden rounded-xl border border-border bg-muted">
                     <img src={screenshot} alt="Screenshot preview" className="h-full w-full object-contain" />
                     <button
-                      onClick={() => setScreenshot(null)}
-                      className="absolute right-2 top-2 rounded-full bg-red-500 p-1.5 text-white hover:bg-red-600 transition-colors"
+                      onClick={() => {
+                        setScreenshot(null);
+                        setScreenshotFile(null);
+                      }}
+                      disabled={submittingProof}
+                      className="absolute right-2 top-2 rounded-full bg-red-500 p-1.5 text-white hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1004,19 +1038,27 @@ function ConfirmationStep({
                     </button>
                   </div>
                 ) : (
-                  <label className="flex min-h-24 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-background p-4 hover:border-brand-500 transition-colors">
+                  <label className="flex min-h-24 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-background p-4 hover:border-brand-500 transition-colors opacity-100 [&:has(input:disabled)]:opacity-50 [&:has(input:disabled)]:cursor-not-allowed">
                     <span className="text-xs font-semibold text-brand-500">Click to upload screenshot</span>
                     <span className="mt-1 text-[10px] text-muted-foreground">JPG, PNG or WEBP up to 5MB</span>
-                    <input type="file" accept="image/*" onChange={handleScreenshotChange} className="hidden" />
+                    <input type="file" accept="image/*" onChange={handleScreenshotChange} className="hidden" disabled={submittingProof} />
                   </label>
                 )}
               </div>
             </div>
             <button
               onClick={submitProof}
-              className="w-full rounded-xl bg-brand-500 py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand-500/25 hover:bg-brand-600 transition-all"
+              disabled={submittingProof}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-500 py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand-500/25 hover:bg-brand-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Submit Payment Proof
+              {submittingProof ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                'Submit Payment Proof'
+              )}
             </button>
           </div>
         </div>
