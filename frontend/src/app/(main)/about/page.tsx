@@ -50,7 +50,7 @@ export default function AboutPage() {
         <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-brand-900/30 via-slate-950 to-slate-950 opacity-90" />
         <div className="relative z-10 mx-auto max-w-4xl px-4 text-center">
           <span className="rounded-full bg-brand-500/10 px-4 py-1.5 text-xs font-semibold text-brand-400">
-            About Adventure
+            About HimYatraa
           </span>
           <h1 className="mt-6 font-display text-4xl font-extrabold tracking-tight text-white sm:text-6xl">
             Empowering Your <br className="hidden sm:inline" />

@@ -78,7 +78,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!trek) return { title: 'Trek Not Found' };
 
   return {
-    title: trek.metaTitle || `${trek.title} | Adventure`,
+    title: trek.metaTitle || `${trek.title} | HimYatraa`,
     description: trek.metaDescription || trek.shortDescription,
     openGraph: {
       title: trek.title,

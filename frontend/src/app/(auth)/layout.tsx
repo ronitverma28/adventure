@@ -7,7 +7,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="relative z-10 p-10">
           <a href="/" className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500"><span className="text-lg text-white">&#9968;</span></div>
-            <span className="font-display text-xl font-bold text-white">Adventure</span>
+            <span className="font-display text-xl font-bold text-white">HimYatraa</span>
           </a>
         </div>
         <div className="relative z-10 p-10">
@@ -27,7 +27,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <div className="mb-8 flex justify-center lg:hidden">
             <a href="/" className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand-500"><span className="text-base text-white">&#9968;</span></div>
-              <span className="font-display text-lg font-bold text-foreground">Adventure</span>
+              <span className="font-display text-lg font-bold text-foreground">HimYatraa</span>
             </a>
           </div>
           {children}

@@ -19,23 +19,23 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Adventure | Premium Himalayan Treks',
-    template: '%s | Adventure',
+    default: 'HimYatraa | Premium Himalayan Treks',
+    template: '%s | HimYatraa',
   },
   description:
     'Discover India\'s most breathtaking treks. Expert guides, seamless booking, and unforgettable experiences in the Himalayas and beyond.',
   keywords: ['trekking', 'hiking', 'Himalayas', 'adventure travel', 'India treks'],
-  authors: [{ name: 'Adventure Platform' }],
+  authors: [{ name: 'HimYatraa Platform' }],
   openGraph: {
     type: 'website',
     locale: 'en_IN',
-    url: 'https://adventure.com',
-    siteName: 'Adventure',
+    url: 'https://himyatraa.com',
+    siteName: 'HimYatraa',
     images: [{ url: '/og-image.jpg', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    site: '@adventuretreks',
+    site: '@himyatraa',
   },
   robots: { index: true, follow: true },
 };

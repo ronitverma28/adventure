@@ -102,7 +102,7 @@ export function WhyChooseUs() {
           className="mb-16 text-center"
         >
           <span className="mb-3 inline-block text-xs font-semibold uppercase tracking-widest text-brand-400">
-            Why Adventure?
+            Why HimYatraa?
           </span>
           <h2 className="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
             The Adventure Difference
