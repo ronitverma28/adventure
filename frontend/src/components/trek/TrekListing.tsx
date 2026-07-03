@@ -164,7 +164,7 @@ export function TrekListing({ initialTreks = [] }: TrekListingProps) {
 
   return (
     <>
-      <div className="flex gap-4 lg:gap-6">
+      <div className="flex flex-col lg:flex-row gap-6">
         <TrekFilterPanel
           filters={filters}
           onChange={setFilters}
