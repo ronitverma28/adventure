@@ -117,6 +117,7 @@ export interface TrekGuide {
   certifications?: string[];
   specializations?: string[];
   avgRating?: number;
+  totalTreks?: number;
   isVerified?: boolean;
 }
 
