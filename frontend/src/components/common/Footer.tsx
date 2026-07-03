@@ -13,10 +13,7 @@ const FOOTER_LINKS = {
   Destinations: [
     { label: 'Uttarakhand', href: '/treks?state=Uttarakhand' },
     { label: 'Himachal Pradesh', href: '/treks?state=Himachal Pradesh' },
-    { label: 'Ladakh', href: '/treks?state=Ladakh' },
-    { label: 'Sikkim', href: '/treks?state=Sikkim' },
     { label: 'Kashmir', href: '/treks?state=Kashmir' },
-    { label: 'West Bengal', href: '/treks?state=West Bengal' },
   ],
   Company: [
     { label: 'About Us', href: '/about' },
