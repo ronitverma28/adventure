@@ -377,7 +377,7 @@ export const MOCK_TREKS: Trek[] = [
     difficulty: "EASY",
     pricePerPerson: 7500,
     coverImageUrl:
-      "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80",
+      "/images/hemkund.jpg",
     avgRating: 4.9,
     totalReviews: 2100,
     totalBookings: 6500,

@@ -47,8 +47,8 @@ const GALLERY = [
   },
   {
     id: 6,
-    url: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80',
-    thumb: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&q=75',
+    url: '/images/hemkund.jpg',
+    thumb: '/images/hemkund.jpg',
     caption: 'Valley of Flowers',
     location: 'Uttarakhand',
     span: 'col-span-2',
