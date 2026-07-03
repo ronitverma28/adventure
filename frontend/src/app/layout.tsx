@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     locale: 'en_IN',
     url: 'https://www.himyatraa.com',
     siteName: 'HimYatraa',
-    images: [{ url: '/images/logo.png', width: 1200, height: 630 }],
+    images: [{ url: '/images/app-logo.png', width: 1200, height: 630 }],
   },
   icons: {
     icon: "/images/app-logo.png",

@@ -1,12 +1,12 @@
-import type { Metadata } from 'next';
-import { HeroSection } from '@/components/home/HeroSection';
-import { FeaturedTreks } from '@/components/home/FeaturedTreks';
-import { WhyChooseUs } from '@/components/home/WhyChooseUs';
-import { HowItWorks } from '@/components/home/HowItWorks';
-import { PopularDestinations } from '@/components/home/PopularDestinations';
-import { CustomerStories } from '@/components/home/CustomerStories';
-import { CommunitySection } from '@/components/home/CommunitySection';
-import { FAQSection } from '@/components/home/FAQSection';
+import type { Metadata } from "next";
+import { HeroSection } from "@/components/home/HeroSection";
+import { FeaturedTreks } from "@/components/home/FeaturedTreks";
+import { WhyChooseUs } from "@/components/home/WhyChooseUs";
+import { HowItWorks } from "@/components/home/HowItWorks";
+import { PopularDestinations } from "@/components/home/PopularDestinations";
+import { CustomerStories } from "@/components/home/CustomerStories";
+import { CommunitySection } from "@/components/home/CommunitySection";
+import { FAQSection } from "@/components/home/FAQSection";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://himyatraa.com"),
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     "Trek Booking India",
     "Himalayan Treks",
     "Travel Uttarakhand",
-    "Trekking India"
+    "Trekking India",
   ],
 
   authors: [
@@ -77,15 +77,17 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "images/favicon.ico",
+        url: "/favicon.ico",
+        sizes: "any",
       },
       {
-        url: "images/app-logo.png",
+        url: "/images/app-logo.png",
         type: "image/png",
+        sizes: "512x512",
       },
     ],
-    shortcut: "images/favicon.ico",
-    apple: "images/app-logo.png",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
 
   openGraph: {
@@ -93,8 +95,7 @@ export const metadata: Metadata = {
     locale: "en_IN",
     url: "https://www.himyatraa.com",
 
-    title:
-      "Himyatraa | Uttarakhand Trek Booking",
+    title: "Himyatraa | Uttarakhand Trek Booking",
 
     description:
       "Book Valley of Flowers, Hemkund Sahib, Kedarnath and Uttarakhand trekking packages.",
@@ -113,11 +114,9 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
 
-    title:
-      "Himyatraa | Uttarakhand Trek Booking",
+    title: "Himyatraa | Uttarakhand Trek Booking",
 
-    description:
-      "Premium trekking platform for Uttarakhand.",
+    description: "Premium trekking platform for Uttarakhand.",
 
     images: ["/images/app-logo.png"],
   },
