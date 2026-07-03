@@ -305,13 +305,13 @@ public class BookingServiceImpl implements BookingService {
         booking.setStatus(BookingStatus.CANCELLED);
         booking.setCancelledAt(Instant.now());
         booking.setCancellationReason(request.getReason());
-        booking.setPaymentStatus(PaymentStatus.REFUNDED);
+        booking.setPaymentStatus(PaymentStatus.PARTIALLY_REFUNDED);
 
         Payment payment = booking.getPayment();
 
         if (payment != null && payment.getStatus() == PaymentStatus.SUCCESS) {
 
-            payment.setStatus(PaymentStatus.REFUNDED);
+            payment.setStatus(PaymentStatus.PARTIALLY_REFUNDED);
             payment.setRefundAmount(payment.getAmount());
             payment.setRefundedAt(Instant.now());
 

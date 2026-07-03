@@ -152,7 +152,7 @@ export function TrekStickyBooking({ trek }: { trek: Trek }) {
         </div>
 
         {/* Coupon */}
-        <div>
+        {/* <div>
           <label className="mb-1.5 block text-xs font-semibold text-foreground">Coupon Code</label>
           <div className="flex gap-2">
             <input
@@ -173,7 +173,7 @@ export function TrekStickyBooking({ trek }: { trek: Trek }) {
           {couponApplied && (
             <p className="mt-1 text-xs text-emerald-500">✓ 10% discount applied!</p>
           )}
-        </div>
+        </div> */}
 
         {/* Price breakdown */}
         <div className="rounded-xl border border-border bg-muted/30 p-4 space-y-2">
