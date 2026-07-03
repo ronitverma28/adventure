@@ -102,8 +102,7 @@ export function HeroSection() {
       </div>
  
       {/* ── Main Content ── */}
-      <motion.div
-        style={{ opacity }}
+      <div
         className="relative z-10 flex w-full flex-col items-center justify-center px-4 py-8 text-center my-auto"
       >
         {/* Badge */}
@@ -159,15 +158,6 @@ export function HeroSection() {
             <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
           </a>
 
-          <button
-            onClick={() => setIsVideoOpen(true)}
-            className="group flex items-center gap-3 rounded-full border border-white/30 bg-white/10 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5"
-          >
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 transition-colors group-hover:bg-white/30">
-              <Play className="h-3 w-3 fill-white text-white" />
-            </span>
-            Watch Our Story
-          </button>
         </motion.div>
 
         {/* Search Bar */}
@@ -202,7 +192,7 @@ export function HeroSection() {
             </motion.div>
           ))}
         </motion.div> */}
-      </motion.div>
+      </div>
 
       {/* ── Slide Indicators ── */}
       <div className="absolute bottom-24 left-1/2 z-20 flex -translate-x-1/2 gap-2">

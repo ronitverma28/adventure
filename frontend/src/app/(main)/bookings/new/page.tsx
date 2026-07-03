@@ -954,7 +954,7 @@ function DetailsStep({
             />
           </div>
 
-          <div className="flex flex-col gap-1 sm:col-span-2">
+          {/* <div className="flex flex-col gap-1 sm:col-span-2">
             <label className="text-xs font-semibold text-foreground">
               Special Requests
             </label>
@@ -964,7 +964,7 @@ function DetailsStep({
               value={contact.specialRequests || ''}
               onChange={(e) => onContactChange({ ...contact, specialRequests: e.target.value })}
             />
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
