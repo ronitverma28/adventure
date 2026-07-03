@@ -53,7 +53,7 @@ export default function MyBookingsPage() {
     try {
       await bookingApi.cancelBooking(cancelRef, cancelReason);
       setBookings((prev) =>
-        prev.map((b) => b.bookingRef === cancelRef ? { ...b, status: 'CANCELLED' } : b)
+        prev.map((b) => b.bookingRef === cancelRef ? { ...b, status: 'CANCELLED', paymentStatus: 'PARTIALLY_REFUNDED' } : b)
       );
       toast.success('Booking cancelled successfully');
       setCancelRef(null);
