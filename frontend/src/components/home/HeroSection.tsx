@@ -57,7 +57,7 @@ export function HeroSection() {
   return (
     <section
       ref={containerRef}
-      className="relative h-screen min-h-[820px] sm:min-h-[750px] md:min-h-[700px] bg-mountain-900"
+      className="relative min-h-screen lg:h-screen lg:min-h-[750px] bg-mountain-900 flex flex-col justify-center py-20 lg:py-0"
     >
       {/* ── Background layers wrapped in overflow-hidden so parallax stays clipped ── */}
       <div className="absolute inset-0 overflow-hidden">
@@ -87,11 +87,11 @@ export function HeroSection() {
             )}
           </AnimatePresence>
         </motion.div>
-
+ 
         {/* ── Gradient Overlays ── */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/80" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent" />
-
+ 
         {/* ── Noise Texture ── */}
         <div
           className="absolute inset-0 opacity-[0.03] mix-blend-overlay"
@@ -100,11 +100,11 @@ export function HeroSection() {
           }}
         />
       </div>
-
+ 
       {/* ── Main Content ── */}
       <motion.div
         style={{ opacity }}
-        className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center"
+        className="relative z-10 flex w-full flex-col items-center justify-center px-4 py-8 text-center my-auto"
       >
         {/* Badge */}
         <motion.div
@@ -114,7 +114,7 @@ export function HeroSection() {
           className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 backdrop-blur-sm"
         >
           <Star className="h-3.5 w-3.5 fill-brand-400 text-brand-400" />
-          <span className="text-xs font-medium tracking-widest text-white/90 uppercase">
+          <span className="text-[10px] sm:text-xs font-medium tracking-widest text-white/90 uppercase">
             India&apos;s #1 Premium Trek Platform
           </span>
         </motion.div>
