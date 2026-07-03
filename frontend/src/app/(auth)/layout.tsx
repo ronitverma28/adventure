@@ -1,3 +1,5 @@
+import { Mountain } from "lucide-react";
+
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen">
@@ -5,8 +7,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=85')` }} />
         <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/40 to-brand-900/60" />
         <div className="relative z-10 p-10">
-          <a href="/" className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500"><span className="text-lg text-white">&#9968;</span></div>
+          <a href="/" className="flex w-9 h-9 items-center gap-1.5">
+            <div className="flex items-center justify-center rounded-xl  shadow-brand-500/30 transition-transform group-hover:scale-105">
+                  <Mountain size={24} color="#e08800" strokeWidth={3} />
+                </div>
             <span className="font-display text-xl font-bold text-white">HimYatraa</span>
           </a>
         </div>

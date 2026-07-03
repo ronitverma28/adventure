@@ -4,7 +4,7 @@ export const siteConfig = {
   description:
     'India\'s premium adventure travel platform. Expert-guided treks, seamless booking, and unforgettable Himalayan experiences.',
   url: 'https://himyatraa.com',
-  ogImage: '/og-image.jpg',
+  ogImage: 'images/logo.png',
   email: 'riteshthapliyal07@gmail.com',
   phone: '+91 89791 17745',
   whatsapp: '+918979117745',

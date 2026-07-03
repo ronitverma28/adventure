@@ -6,45 +6,51 @@ import { ArrowRight, Mountain } from 'lucide-react';
 
 const DESTINATIONS = [
   {
+    id: 1,
     name: 'Uttarakhand',
     treks: 48,
-    image: '/images/popular/uttarakhand.jpg',
-    highlight: 'Valley of Flowers · Roopkund · Kedarkantha',
+    image: '/images/popular/hem_002.jpeg',
+    highlight: 'Hemkund Sahib · Joshimath',
     size: 'large',
   },
   {
-    name: 'Himachal Pradesh',
+    id: 2,
+    name: 'Uttarakhand',
     treks: 36,
-    image: '/images/popular/himachal.jpg',
-    highlight: 'Hampta Pass · Bali Pass · Pin Parvati',
+    image: '/images/popular/valley_002.jpeg',
+    highlight: 'Valley of Flowers · Joshimath',
     size: 'medium',
   },
   {
-    name: 'Ladakh',
+    id: 3,
+    name: 'Uttarakhand',
     treks: 22,
-    image: '/images/popular/ladakh.jpg',
-    highlight: 'Chadar Trek · Markha Valley · Stok Kangri',
+    image: '/images/popular/valley_003.jpeg',
+    highlight: 'Valley of Flowers · Joshimath',
     size: 'medium',
   },
   {
-    name: 'Sikkim',
+    id: 4,
+    name: 'Uttarakhand',
     treks: 18,
-    image: '/images/popular/sikkim.jpg',
-    highlight: 'Goecha La · Dzongri · Green Lake',
+    image: '/images/popular/hem_001.jpeg',
+    highlight: 'Hemkund Sahib · Joshimath',
     size: 'small',
   },
   {
-    name: 'West Bengal',
+    id: 5,
+    name: 'Uttarakhand',
     treks: 14,
-    image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=600&q=80',
-    highlight: 'Sandakphu · Phalut · Singalila Ridge',
+    image: '/images/popular/hem_003.jpeg',
+    highlight: 'Hemkund Sahib · Joshimath',
     size: 'small',
   },
   {
-    name: 'Kashmir',
+    id: 6,
+    name: 'Uttarakhand',
     treks: 12,
-    image: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&q=80',
-    highlight: 'Kashmir Great Lakes · Tarsar Marsar',
+    image: '/images/popular/valley_001.jpeg',
+    highlight: 'Valley of Flowers · Joshimath',
     size: 'small',
   },
 ];
@@ -88,13 +94,13 @@ export function PopularDestinations() {
         <div ref={ref} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {DESTINATIONS.map((dest, i) => (
             <motion.a
-              key={dest.name}
+              key={dest.id}
               href={`/treks?state=${dest.name}`}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={isInView ? { opacity: 1, scale: 1 } : {}}
+              onHoverStart={()=> setHovered(dest.name)}
+              onHoverEnd={()=> setHovered(null)}
               transition={{ duration: 0.5, delay: i * 0.08 }}
-              onHoverStart={() => setHovered(dest.name)}
-              onHoverEnd={() => setHovered(null)}
               className={`group relative overflow-hidden rounded-2xl ${
                 dest.size === 'large'
                   ? 'col-span-1 sm:col-span-2 sm:row-span-2 h-64 sm:h-80 lg:min-h-[400px]'
@@ -117,10 +123,9 @@ export function PopularDestinations() {
               <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                 <div className="flex items-end justify-between">
                   <div>
-                    <h3 className="font-display text-xl font-bold text-white">{dest.name}</h3>
-                    {dest.size === 'large' && (
                       <p className="mt-1 text-xs text-white/60">{dest.highlight}</p>
-                    )}
+                    <h3 className="text-lg font-semibold text-white">{dest.name}</h3>
+                    
                   </div>
                   <div className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 backdrop-blur-sm">
                     <Mountain className="h-3 w-3 text-brand-400" />

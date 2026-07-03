@@ -24,14 +24,19 @@ export const metadata: Metadata = {
   },
   description:
     'Discover India\'s most breathtaking treks. Expert guides, seamless booking, and unforgettable experiences in the Himalayas and beyond.',
-  keywords: ['trekking', 'hiking', 'Himalayas', 'adventure travel', 'India treks'],
+  keywords: ['valley of flower','hemkund','uttrakhand trips','himyatra','himyatraa','trekking', 'hiking', 'Himalayas', 'adventure travel', 'India treks', ],
   authors: [{ name: 'HimYatraa Platform' }],
   openGraph: {
     type: 'website',
     locale: 'en_IN',
-    url: 'https://himyatraa.com',
+    url: 'https://www.himyatraa.com',
     siteName: 'HimYatraa',
-    images: [{ url: '/og-image.jpg', width: 1200, height: 630 }],
+    images: [{ url: '/images/logo.png', width: 1200, height: 630 }],
+  },
+  icons: {
+    icon: "/images/app-logo.png",
+    shortcut: "/images/app-logo.png",
+    apple: "/images/app-logo.png",
   },
   twitter: {
     card: 'summary_large_image',

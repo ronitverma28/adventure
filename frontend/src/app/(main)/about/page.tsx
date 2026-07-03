@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     'safety first trekking',
   ],
   alternates: {
-    canonical: 'https://adventure.com/about',
+    canonical: 'https://www.himyatraa.com/about',
   },
 };
 

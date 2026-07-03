@@ -9,10 +9,10 @@ import { CommunitySection } from '@/components/home/CommunitySection';
 import { FAQSection } from '@/components/home/FAQSection';
 
 export const metadata: Metadata = {
-  title: 'Adventure | Premium Himalayan Treks & Adventure Tours',
+  title: 'HimYatraa | Premium Himalayan Treks & Adventure Tours',
   description:
     'Discover and book premium Himalayan treks with expert guides. Plan your next adventure to Kedarkantha, Roopkund, Hampta Pass, or Valley of Flowers using our smart AI trek planner.',
-  keywords: [
+  keywords: ['valley of flower','hemkund','uttrakhand trips','himyatra','himyatraa','trekking', 'hiking', 'Himalayas', 'adventure travel', 'India treks',
     'Himalayan trekking',
     'best treks in India',
     'mountain expeditions',
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     'AI trek planner',
   ],
   alternates: {
-    canonical: 'https://adventure.com',
+    canonical: 'https://www.adventure.com',
   },
 };
 

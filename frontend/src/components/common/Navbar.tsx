@@ -49,15 +49,15 @@ export function Navbar() {
       >
         <div className="container">
           <div className="flex h-16 items-center justify-between md:h-16">
-            {/* Logo */}
-            <a href="/" className="group flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500 shadow-lg shadow-brand-500/30 transition-transform group-hover:scale-105">
-                <Mountain className="h-5 w-5 text-white" />
-              </div>
-              <span className={cn('font-display text-xl font-bold', brandTextColor)}>
-                HimYatraa
-              </span>
-            </a>
+              {/* Logo */}
+              <a href="/" className="group flex items-center gap-1">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl  shadow-brand-500/30 transition-transform group-hover:scale-105">
+                  <Mountain size={24} color="#e08800" strokeWidth={3} />
+                </div>
+                <span className={cn('font-display text-xl font-bold', brandTextColor)}>
+                  HimYatraa
+                </span>
+              </a>
 
             {/* Desktop Nav */}
             <nav className="hidden items-center gap-1 md:flex">
