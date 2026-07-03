@@ -1306,7 +1306,7 @@ function BookingSummary({
               <SummaryRow label="Travelers" value={`${totalTravelers}`} />
               <SummaryRow label="Subtotal" value={formatCurrency(pricing.subtotal)} />
               {couponDiscount > 0 && <SummaryRow label="Coupon discount" value={`-${formatCurrency(couponDiscount)}`} success />}
-              <SummaryRow label="GST 18%" value={formatCurrency(pricing.taxAmount)} />
+              {/* <SummaryRow label="GST 18%" value={formatCurrency(pricing.taxAmount)} /> */}
               <div className="border-t border-border pt-3">
                 <SummaryRow label="Total" value={formatCurrency(pricing.total)} strong />
               </div>
