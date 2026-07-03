@@ -11,6 +11,7 @@ interface Guide {
 }
 
 export function TrekGuideProfile({ guide }: { guide: Guide }) {
+  console.log('Guide:', guide);
   return (
     <div>
       <SectionHeader icon={UserCheck} label="Your Guide" title="Meet Your Trek Leader" />
