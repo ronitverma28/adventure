@@ -1,7 +1,21 @@
-'use client';
-
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Mountain, Compass, ShieldCheck, Award, Heart, Users } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'About Us | Our Story & Himalayan Mission',
+  description:
+    'Learn about Adventure, our team of passionate mountain explorers, safety professionals, and community builders. Discover our mission to make Himalayan expeditions safe and sustainable.',
+  keywords: [
+    'about adventure treks',
+    'responsible tourism Himalayas',
+    'mountain guides team',
+    'safety first trekking',
+  ],
+  alternates: {
+    canonical: 'https://adventure.com/about',
+  },
+};
 
 const stats = [
   { label: 'Treks Organized', value: '150+' },

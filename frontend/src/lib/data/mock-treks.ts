@@ -375,7 +375,7 @@ export const MOCK_TREKS: Trek[] = [
     durationDays: 6,
     durationNights: 5,
     difficulty: "EASY",
-    pricePerPerson: 11200,
+    pricePerPerson: 7500,
     coverImageUrl:
       "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80",
     avgRating: 4.9,

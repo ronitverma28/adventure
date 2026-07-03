@@ -13,9 +13,6 @@ const INSTAGRAM_POSTS = [
   'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&q=75',
   'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=300&q=75',
   'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=300&q=75',
-  'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=300&q=75',
-  'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=300&q=75',
-  'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=300&q=75',
 ];
 
 export function CommunitySection() {

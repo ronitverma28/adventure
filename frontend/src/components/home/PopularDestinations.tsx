@@ -111,10 +111,10 @@ export function PopularDestinations() {
               />
 
               {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
               {/* Content */}
-              <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5">
+              <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                 <div className="flex items-end justify-between">
                   <div>
                     <h3 className="font-display text-xl font-bold text-white">{dest.name}</h3>

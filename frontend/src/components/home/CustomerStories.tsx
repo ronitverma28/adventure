@@ -99,22 +99,22 @@ export function CustomerStories() {
           </p>
         </motion.div>
 
-        <div ref={ref} className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
-          {/* Left: Featured Story */}
+        <div ref={ref} className="mx-auto max-w-3xl text-center">
+          {/* Featured Story */}
           <AnimatePresence mode="wait">
             <motion.div
               key={story.id}
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 30 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
-              className="relative"
+              className="relative flex flex-col items-center"
             >
               {/* Quote icon */}
-              <Quote className="mb-6 h-10 w-10 text-brand-500/30" />
+              <Quote className="mx-auto mb-6 h-10 w-10 text-brand-500/30" />
 
               {/* Stars */}
-              <div className="mb-4 flex gap-1">
+              <div className="mb-4 flex justify-center gap-1">
                 {Array.from({ length: story.rating }).map((_, i) => (
                   <Star key={i} className="h-4 w-4 fill-brand-400 text-brand-400" />
                 ))}
@@ -126,26 +126,19 @@ export function CustomerStories() {
               </blockquote>
 
               {/* Author */}
-              <div className="flex items-center gap-4">
-                <img
-                  src={story.avatar}
-                  alt={story.name}
-                  className="h-14 w-14 rounded-full object-cover ring-2 ring-brand-500/30"
-                />
-                <div>
-                  <div className="font-semibold text-foreground">{story.name}</div>
-                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                    <MapPin className="h-3 w-3" />
-                    {story.location}
-                  </div>
-                  <div className="mt-0.5 text-xs text-brand-500">
-                    {story.trek} · {story.date}
-                  </div>
+              <div className="flex flex-col items-center">
+                <div className="font-semibold text-foreground">{story.name}</div>
+                <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
+                  <MapPin className="h-3 w-3" />
+                  {story.location}
+                </div>
+                <div className="mt-1 text-xs text-brand-500 font-semibold">
+                  {story.trek} · {story.date}
                 </div>
               </div>
 
               {/* Navigation */}
-              <div className="mt-10 flex items-center gap-4">
+              <div className="mt-10 flex items-center justify-center gap-4">
                 <button
                   onClick={prev}
                   className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background transition-colors hover:bg-muted"
@@ -173,31 +166,6 @@ export function CustomerStories() {
               </div>
             </motion.div>
           </AnimatePresence>
-
-          {/* Right: Mini Cards */}
-          <div className="relative">
-            {/* Mini story cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {STORIES.filter((_, i) => i !== active)
-                .map((s) => (
-                  <button
-                    key={s.id}
-                    onClick={() => setActive(STORIES.indexOf(s))}
-                    className="group flex items-center gap-3 overflow-hidden rounded-xl border border-border bg-card p-3 text-left transition-all hover:border-brand-500/30 hover:shadow-md"
-                  >
-                    <img
-                      src={s.avatar}
-                      alt={s.name}
-                      className="h-10 w-10 shrink-0 rounded-full object-cover"
-                    />
-                    <div className="min-w-0">
-                      <div className="truncate text-xs font-semibold text-foreground">{s.name}</div>
-                      <div className="truncate text-[10px] text-muted-foreground">{s.trek}</div>
-                    </div>
-                  </button>
-                ))}
-            </div>
-          </div>
         </div>
       </div>
     </section>
